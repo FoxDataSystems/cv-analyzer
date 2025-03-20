@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+
+{% block title %}Cover Letter Writer - CV Analyzer{% endblock %}
+
+{% block content %}
+<div class="welcome-banner mb-4">
+    <h2 class="page-title">Cover Letter Writer</h2>
+    <p>Genereer een gepersonaliseerde motivatiebrief op basis van het profiel van de kandidaat en de vacature.</p>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('vacancy_match') }}">Vacature Matching</a></li>
+            <li class="breadcrumb-item active">Cover Letter Writer</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Main layout with tabs -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <!-- Tabs navigation -->
+        <ul class="nav nav-tabs" id="cover-letter-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="input-tab" data-bs-toggle="tab" data-bs-target="#input-content" 
+                        type="button" role="tab" aria-controls="input-content" aria-selected="true">
+                    <i class="bi bi-pencil-square me-2"></i>Input
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-content" 
+                        type="button" role="tab" aria-controls="preview-content" aria-selected="false">
+                    <i class="bi bi-eye me-2"></i>Preview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="template-tab" data-bs-toggle="tab" data-bs-target="#template-content" 
+                        type="button" role="tab" aria-controls="template-content" aria-selected="false">
+                    <i class="bi bi-file-earmark-code me-2"></i>Template
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Tabs content -->
+        <div class="tab-content p-4" id="cover-letter-tab-content">
+            <!-- Input Tab -->
+            <div class="tab-pane fade show active" id="input-content" role="tabpanel" aria-labelledby="input-tab">
+                <div class="row">
+                    <!-- Left Column - Candidate Information -->
+                    <div class="col-md-5">
+                        <div class="card mb-4 border">
+                            <div class="card-header" style="background: linear-gradient(45deg, var(--primary-color), var(--primary-dark)); color: white;">
+                                <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Kandidaat Informatie</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" 
+                                         style="width: 50px; height: 50px;">
+                                        <i class="bi bi-person text-primary" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0">{{ candidate.name }}</h5>
+                                        <p class="text-muted mb-0">
+                                            <i class="bi bi-envelope-fill me-1"></i>{{ candidate.email }}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <hr>
+                                
+                                <!-- Skills Section -->
+                                <div class="mb-3">
+                                    <h6 class="d-flex align-items-center">
+                                        <i class="bi bi-stars me-2 text-primary"></i>Vaardigheden
+                                    </h6>
+                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                        {% for skill in candidate.skills %}
+                                        <span class="badge bg-light text-dark border">
+                                            {{ skill.name }}{% if skill.years %} ({{ skill.years }} jaar){% endif %}
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Work Experience Section -->
+                                <div>
+                                    <h6 class="d-flex align-items-center">
+                                        <i class="bi bi-briefcase-fill me-2 text-primary"></i>Werkervaring
+                                    </h6>
+                                    <div class="timeline mt-2">
+                                        {% for exp in candidate.work_experience %}
+                                        <div class="timeline-item mb-2">
+                                            <div class="d-flex">
+                                                <div class="timeline-marker me-3"></div>
+                                                <div class="timeline-content">
+                                                    <div class="fw-medium">{{ exp.position }}</div>
+                                                    <div class="d-flex align-items-center text-muted small mb-1">
+                                                        <i class="bi bi-building me-1"></i>{{ exp.company }}
+                                                    </div>
+                                                    <div class="text-muted small">
+                                                        <i class="bi bi-calendar-event me-1"></i>{{ exp.start_date }} - {{ exp.end_date or 'Heden' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column - Input Controls -->
+                    <div class="col-md-7">
+                        <!-- Vacancy Text Input -->
+                        <div class="card mb-4 border">
+                            <div class="card-header" style="background: linear-gradient(45deg, var(--primary-color), var(--primary-dark)); color: white;">
+                                <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Vacature Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <label for="vacancy_text" class="form-label">Plak de vacaturetekst hieronder:</label>
+                                <textarea class="form-control" id="vacancy_text" rows="10" 
+                                        placeholder="Plak de vacaturetekst hier...">{{ vacancy_text if vacancy_text }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Language Selection & Generate Button -->
+                        <div class="card border">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-6">
+                                        <h6 class="mb-3"><i class="bi bi-translate me-2"></i>Selecteer Taal:</h6>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-outline-success active px-4" data-language="nl">
+                                                <i class="bi bi-globe2 me-2"></i>Nederlands
+                                            </button>
+                                            <button type="button" class="btn btn-outline-success px-4" data-language="en">
+                                                <i class="bi bi-globe me-2"></i>English
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                        <button class="btn btn-success btn-lg px-4" id="generate-letter">
+                                            <i class="bi bi-magic me-2"></i>Genereer Cover Letter
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Preview Tab -->
+            <div class="tab-pane fade" id="preview-content" role="tabpanel" aria-labelledby="preview-tab">
+                <div class="d-flex justify-content-end mb-3 gap-2">
+                    <button class="btn btn-outline-success" id="copy-letter">
+                        <i class="bi bi-clipboard me-1"></i>Kopiëren
+                    </button>
+                </div>
+                
+                <div class="card border position-relative">
+                    <div class="card-body">
+                        <div class="preview-container p-4" id="cover-letter-preview">
+                            <!-- Initial state -->
+                            <div class="text-center text-muted py-5">
+                                <i class="bi bi-file-text display-4 mb-3"></i>
+                                <p>Vul de vacaturedetails in en klik op 'Genereren' om een motivatiebrief te maken.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Loading overlay -->
+                        <div class="loading-overlay d-none">
+                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                                <div class="text-center">
+                                    <div class="spinner-border" style="color: var(--primary-color);" role="status">
+                                        <span class="visually-hidden">Laden...</span>
+                                    </div>
+                                    <p class="mt-2 mb-0">Motivatiebrief genereren...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Template Tab -->
+            <div class="tab-pane fade" id="template-content" role="tabpanel" aria-labelledby="template-tab">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Pas het PDF-template aan. Gebruik <code>{{content}}</code> om aan te geven waar de motivatiebrief moet komen.
+                        </div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <div class="card border">
+                            <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(45deg, var(--primary-color), var(--primary-dark)); color: white;">
+                                <h5 class="mb-0"><i class="bi bi-file-earmark-code me-2"></i>PDF Template</h5>
+                                <button class="btn btn-light btn-sm" id="save-template">
+                                    <i class="bi bi-save me-1"></i>Template Opslaan
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <textarea class="form-control" id="template-editor" rows="15" style="font-family: monospace;">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cover Letter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: right;
+            margin-bottom: 30px;
+        }
+        .date {
+            margin-bottom: 20px;
+        }
+        .content {
+            text-align: justify;
+        }
+        .signature {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <p>{{ candidate.name }}<br>
+        {{ candidate.email }}</p>
+    </div>
+    
+    <div class="date">
+        <p>{{ today_date }}</p>
+    </div>
+    
+    <div class="content">
+        {{content}}
+    </div>
+    
+    <div class="signature">
+        <p>Met vriendelijke groet,<br><br>
+        {{ candidate.name }}</p>
+    </div>
+</body>
+</html>
+                                </textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="card border">
+                            <div class="card-header" style="background: linear-gradient(45deg, var(--primary-color), var(--primary-dark)); color: white;">
+                                <h5 class="mb-0"><i class="bi bi-question-circle me-2"></i>Template Variabelen</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>De volgende variabelen kun je gebruiken in je template:</p>
+                                <ul>
+                                    <li><code>{{ candidate.name }}</code> - Naam van de kandidaat</li>
+                                    <li><code>{{ candidate.email }}</code> - E-mail van de kandidaat</li>
+                                    <li><code>{{ today_date }}</code> - Huidige datum</li>
+                                    <li><code>{{content}}</code> - De gegenereerde motivatiebrief</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const generateButton = document.getElementById('generate-letter');
+    const copyButton = document.getElementById('copy-letter');
+    const previewContainer = document.getElementById('cover-letter-preview');
+    const loadingOverlay = document.querySelector('.loading-overlay');
+    const languageButtons = document.querySelectorAll('[data-language]');
+    const previewTab = document.getElementById('preview-tab');
+    
+    console.log('DOM loaded, generate button:', generateButton); // Debug log
+    
+    // Language selection
+    languageButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            languageButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            this.classList.add('active');
+        });
+    });
+    
+    // Generate letter
+    if (generateButton) {
+        generateButton.addEventListener('click', function() {
+            console.log('Generate button clicked'); // Debug log
+            
+            const vacancyText = document.getElementById('vacancy_text').value.trim();
+            const language = document.querySelector('[data-language].active').dataset.language;
+            
+            if (!vacancyText) {
+                alert('Vul eerst de vacaturetekst in');
+                return;
+            }
+            
+            // Show loading state
+            loadingOverlay.classList.remove('d-none');
+            generateButton.disabled = true;
+            
+            // Switch to preview tab
+            previewTab.click();
+            
+            // Call the API to generate the cover letter
+            fetch('/generate-cover-letter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    vacancy_text: vacancyText,
+                    candidate_id: '{{ candidate.id }}',
+                    language: language
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response received:', data); // Debug log
+                previewContainer.innerHTML = data.cover_letter.replace(/\n/g, '<br>');
+            })
+            .catch(error => {
+                console.error('Error:', error); // Debug log
+                previewContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Er is een fout opgetreden bij het genereren van de motivatiebrief. Probeer het opnieuw.
+                    </div>
+                `;
+            })
+            .finally(() => {
+                loadingOverlay.classList.add('d-none');
+                generateButton.disabled = false;
+            });
+        });
+    }
+    
+    // Copy to clipboard
+    if (copyButton) {
+        copyButton.addEventListener('click', function() {
+            const content = previewContainer.innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = '<i class="bi bi-check me-1"></i>Gekopieerd!';
+                setTimeout(() => {
+                    copyButton.innerHTML = originalText;
+                }, 2000);
+            });
+        });
+    }
+    
+    // Save template
+    const saveTemplateButton = document.getElementById('save-template');
+    const templateEditor = document.getElementById('template-editor');
+    
+    if (saveTemplateButton && templateEditor) {
+        // Load saved template if exists
+        if (localStorage.getItem('coverLetterTemplate')) {
+            templateEditor.value = localStorage.getItem('coverLetterTemplate');
+        }
+        
+        // Save template
+        saveTemplateButton.addEventListener('click', function() {
+            localStorage.setItem('coverLetterTemplate', templateEditor.value);
+            alert('Template opgeslagen!');
+        });
+    }
+});
+</script>
+
+<style>
+/* Timeline styling */
+.timeline {
+    position: relative;
+    padding-left: 0.5rem;
+}
+
+.timeline-marker {
+    width: 12px;
+    height: 12px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    position: relative;
+}
+
+.timeline-marker:before {
+    content: '';
+    position: absolute;
+    height: calc(100% + 1rem);
+    width: 2px;
+    background-color: #e9ecef;
+    left: 5px;
+    top: 12px;
+}
+
+.timeline-item:last-child .timeline-marker:before {
+    display: none;
+}
+
+/* Preview container styling */
+.preview-container {
+    background: white;
+    min-height: 400px;
+    line-height: 1.6;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+}
+
+/* Custom tab styling */
+.nav-tabs .nav-link {
+    color: #6c757d;
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Make the language buttons look like a toggle */
+.btn-group .btn-outline-success:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-group .btn-outline-success.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+</style>
+{% endblock %}

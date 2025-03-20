@@ -485,7 +485,7 @@
             <div class="search-body">
                 <form id="searchForm">
                     <div class="input-group">
-                        <input type="text" id="searchInput" class="form-control" placeholder="Search smartiesby name, email, skills..." aria-label="Search">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search smarties by name, email, skills..." aria-label="Search">
                         <button type="button" class="btn btn-link position-absolute end-0 bg-transparent border-0 d-none" id="clearSearchBtn" style="right: 50px; z-index: 5;">
                             <i class="bi bi-x-circle"></i>
                         </button>
@@ -595,10 +595,11 @@
                                 {% endif %}
                             </div>
                             <div class="candidate-tags">
-                                <!-- Example tags - these would be populated dynamically -->
-                                <span class="candidate-tag">Python</span>
-                                <span class="candidate-tag">JavaScript</span>
-                                <span class="candidate-tag">React</span>
+                                {% if candidate.skills %}
+                                    {% for skill in candidate.skills %}
+                                        <span class="candidate-tag">{{ skill }}</span>
+                                    {% endfor %}
+                                {% endif %}
                             </div>
                         </div>
                     </div>

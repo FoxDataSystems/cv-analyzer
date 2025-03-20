@@ -791,9 +791,14 @@
                                                 </div>
                                                 
                                                 <div class="d-flex justify-content-between">
-                                                    <a href="{{ url_for('view_candidate', candidate_id=match.candidate_id) }}" class="btn btn-sm btn-outline-primary">
-                                                        <i class="bi bi-eye me-1"></i>Profiel Bekijken
-                                                    </a>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{{ url_for('view_candidate', candidate_id=match.candidate_id) }}" class="btn btn-sm btn-outline-primary">
+                                                            <i class="bi bi-eye me-1"></i>Profiel Bekijken
+                                                        </a>
+                                                        <a href="{{ url_for('write_cover_letter', candidate_id=match.candidate_id) }}" class="btn btn-sm btn-outline-success">
+                                                            <i class="bi bi-pencil-square me-1"></i>Cover Letter Schrijven
+                                                        </a>
+                                                    </div>
                                                     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" 
                                                             data-bs-target="#details-{{ match.candidate_id }}">
                                                         <i class="bi bi-list-check me-1"></i>Details Bekijken
@@ -1288,9 +1293,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                                 
                                 <div class="d-flex justify-content-between">
-                                    <a href="/view-candidate/${match.candidate_id}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye me-1"></i>Profiel Bekijken
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <a href="/view-candidate/${match.candidate_id}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye me-1"></i>Profiel Bekijken
+                                        </a>
+                                        <a href="/write-cover-letter/${match.candidate_id}" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-pencil-square me-1"></i>Cover Letter Schrijven
+                                        </a>
+                                    </div>
                                     <button type="button" class="btn btn-sm btn-outline-secondary toggle-details" 
                                             data-target="#details-${match.candidate_id}">
                                         <i class="bi bi-list-check me-1"></i>Details Bekijken

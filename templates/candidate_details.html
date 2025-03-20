@@ -351,6 +351,12 @@
                     <a href="{{ url_for('edit_candidate', candidate_id=candidate.id) }}" class="btn btn-primary">
                         <i class="bi bi-pencil me-2"></i>Edit
                     </a>
+                    <a href="{{ url_for('generate_candidate_cv', candidate_id=candidate.id) }}" class="btn btn-success">
+                        <i class="bi bi-file-earmark-text me-2"></i>Generate CV
+                    </a>
+                    <a href="{{ url_for('view_cv', candidate_id=candidate.id) }}" class="btn btn-primary" target="_blank">
+                        <i class="bi bi-eye"></i> View CV
+                    </a>
                     <form method="post" action="{{ url_for('delete_candidate', candidate_id=candidate.id) }}" id="deleteForm" class="d-inline">
                         <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                             <i class="bi bi-trash me-2"></i>Delete

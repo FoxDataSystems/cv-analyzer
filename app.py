@@ -1,5 +1,5 @@
 from openai import AzureOpenAI
-from flask import Flask, request, render_template, redirect, url_for, flash, jsonify
+from flask import Flask, request, render_template, redirect, url_for, flash, jsonify, send_file, make_response
 import os
 import sqlite3
 import tempfile
@@ -9,12 +9,16 @@ import uuid
 from werkzeug.utils import secure_filename
 import json
 from datetime import datetime
+from jinja2 import Template
+import pdfkit
+# Import the generate_cv function from cv_generator.py
+from cv_generator import generate_cv
 
 # Initialize Azure OpenAI client
 client = AzureOpenAI(
-    api_key=""#your key here,  
-    api_version="" #your version here,
-    azure_endpoint="" #your endpoint here
+    api_key="38nNcGf6Q0VgiB0GvYNAgg7N5Pvvho6oIthbA2GDsXKcanfgubUNJQQJ99BBACfhMk5XJ3w3AAABACOGzXSH",  
+    api_version="2024-05-01-preview",
+    azure_endpoint="https://rl-test-ai.openai.azure.com/"
 )
 
 # Initialize Flask app
@@ -1056,6 +1060,160 @@ def skill_search():
         conn.close()
     
     return render_template('skill_search.html', skill=skill, candidates=candidates)
+
+def get_candidate_by_id(candidate_id):
+    conn = sqlite3.connect('cv_database.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    # Get candidate info
+    cursor.execute('''
+        SELECT c.*, GROUP_CONCAT(s.skill_name) as skills_list
+        FROM candidates c
+        LEFT JOIN skills s ON c.id = s.candidate_id
+        WHERE c.id = ?
+        GROUP BY c.id
+    ''', (candidate_id,))
+    
+    candidate = cursor.fetchone()
+    
+    if candidate:
+        # Get skills separately to maintain the full skill information
+        cursor.execute('''
+            SELECT skill_name, years_experience
+            FROM skills 
+            WHERE candidate_id = ?
+        ''', (candidate_id,))
+        skills = cursor.fetchall()
+        
+        # Convert candidate to dict and add skills
+        candidate_dict = dict(candidate)
+        candidate_dict['skills'] = [
+            {
+                'name': skill['skill_name'],
+                'years': skill['years_experience']
+            } for skill in skills
+        ]
+        
+        # Get work experience
+        cursor.execute('''
+            SELECT company, position, start_date, end_date, description
+            FROM work_experience
+            WHERE candidate_id = ?
+            ORDER BY start_date DESC
+        ''', (candidate_id,))
+        work_experience = cursor.fetchall()
+        candidate_dict['work_experience'] = [dict(exp) for exp in work_experience]
+        
+        # Get certificates
+        cursor.execute('''
+            SELECT name, issuer, date_obtained, expiry_date, description
+            FROM certificates
+            WHERE candidate_id = ?
+            ORDER BY date_obtained DESC
+        ''', (candidate_id,))
+        certificates = cursor.fetchall()
+        candidate_dict['certificates'] = [dict(cert) for cert in certificates]
+        
+        conn.close()
+        return candidate_dict
+    
+    conn.close()
+    return None
+
+@app.route('/write-cover-letter/<string:candidate_id>')
+def write_cover_letter(candidate_id):
+    candidate = get_candidate_by_id(candidate_id)
+    if not candidate:
+        flash('Kandidaat niet gevonden', 'error')
+        return redirect(url_for('vacancy_match'))
+        
+    return render_template(
+        'cover_letter_writer.html',
+        candidate=candidate,
+        vacancy_text=request.args.get('vacancy_text', '')
+    )
+
+@app.route('/generate-cover-letter', methods=['POST'])
+def generate_cover_letter():
+    data = request.get_json()
+    vacancy_text = data['vacancy_text']
+    candidate_id = data['candidate_id']
+    language = data['language']
+    
+    # Get candidate information
+    candidate = get_candidate_by_id(candidate_id)
+    
+    # Create prompt for Azure OpenAI
+    prompt = f"""
+    Please write a professional cover letter in {'Dutch' if language == 'nl' else 'English'} for the following job:
+    
+    Vacancy:
+    {vacancy_text}
+    
+    Candidate Information:
+    Name: {candidate['name']}
+    Skills: {', '.join(skill['name'] for skill in candidate['skills'])}
+    Work Experience: {', '.join(exp['position'] + ' at ' + exp['company'] for exp in candidate['work_experience'])}
+    
+    Please write a personalized cover letter that:
+    1. Matches the candidate's experience with the job requirements
+    2. Highlights relevant skills and experience
+    3. Uses a professional but engaging tone
+    4. Is structured with proper paragraphs
+    5. Is in {'Dutch' if language == 'nl' else 'English'}
+    """
+    
+    # Use your existing Azure OpenAI client
+    response = client.chat.completions.create(
+        model="gpt-4",  # or whatever model you're using
+        messages=[
+            {"role": "system", "content": "You are a professional cover letter writer."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=1000
+    )
+    
+    cover_letter = response.choices[0].message.content
+    
+    return jsonify({'cover_letter': cover_letter})
+
+@app.route('/generate-candidate-cv/<string:candidate_id>')
+def generate_candidate_cv(candidate_id):
+    try:
+        # Call the generate_cv function from cv_generator.py
+        from cv_generator import generate_cv
+        
+        # Generate the CV
+        html_content = generate_cv(candidate_id)
+        
+        # Create a unique filename
+        filename = f"cv_{candidate_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.html"
+        
+        # Create a response with the HTML content
+        response = make_response(html_content)
+        response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+        response.headers["Content-Type"] = "text/html"
+        
+        return response
+    except Exception as e:
+        flash(f'Error generating CV: {str(e)}', 'error')
+        return redirect(url_for('view_candidate', candidate_id=candidate_id))
+
+@app.route('/view_cv/<candidate_id>')
+def view_cv(candidate_id):
+    try:
+        # Generate the CV HTML
+        html_content = generate_cv(candidate_id)
+        
+        # Return the HTML content
+        return html_content
+    except Exception as e:
+        import traceback
+        print(f"Error generating CV: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

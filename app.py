@@ -16,9 +16,9 @@ from cv_generator import generate_cv
 
 # Initialize Azure OpenAI client
 client = AzureOpenAI(
-    api_key="38nNcGf6Q0VgiB0GvYNAgg7N5Pvvho6oIthbA2GDsXKcanfgubUNJQQJ99BBACfhMk5XJ3w3AAABACOGzXSH",  
-    api_version="2024-05-01-preview",
-    azure_endpoint="https://rl-test-ai.openai.azure.com/"
+    api_key="xxx",  
+    api_version="xxx",
+    azure_endpoint="xxx"
 )
 
 # Initialize Flask app

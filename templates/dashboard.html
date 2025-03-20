@@ -1,0 +1,544 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CV Analyzer{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --wortell-blue: #0078D4;
+        --wortell-dark-blue: #005A9E;
+        --wortell-light-blue: #50A0D2;
+        --wortell-green: #00D66C;
+        --wortell-dark-green: #00B85D;
+        --wortell-light-green: #33DB84;
+        --wortell-purple: #6C1F85;
+        --wortell-gray: #F3F3F3;
+        --wortell-dark-gray: #333333;
+        
+        /* Add these variables to exactly match candidates.html */
+        --primary-color: var(--wortell-green);
+        --primary-dark: var(--wortell-dark-green);
+        --primary-light: var(--wortell-light-green);
+        --secondary-color: var(--wortell-purple);
+        --secondary-dark: #591a6d;
+        --secondary-light: #8229a0;
+        --light-bg: #f8f9fa;
+        --dark-bg: #212529;
+        --text-color: #2c2c2c;
+        --light-text: #f8f9fa;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+
+    .welcome-banner {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #7cd3c7 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+    }
+
+    .welcome-banner h2 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-banner p {
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+        max-width: 600px;
+    }
+
+    .welcome-banner .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .welcome-banner .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+    }
+
+    .welcome-banner .breadcrumb-item a:hover {
+        color: white;
+    }
+
+    .welcome-banner .breadcrumb-item.active {
+        color: white;
+    }
+
+    .welcome-banner .breadcrumb-item+.breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .btn-primary {
+        background-color: var(--wortell-green);
+        border: none;
+        box-shadow: 0 2px 6px rgba(0,214,108,0.2);
+        border-radius: var(--border-radius);
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--wortell-dark-green);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,214,108,0.3);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        position: relative;
+        border-top: 4px solid var(--wortell-green);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: var(--wortell-blue);
+        margin-bottom: 0.5rem;
+        display: inline-block;
+    }
+    
+    .animate-number {
+        animation: countUp 2s ease-out forwards;
+    }
+
+    .stat-label {
+        color: var(--text-color);
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+    
+    .stat-highlight {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--wortell-blue);
+        margin-top: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .stat-sublabel {
+        color: var(--wortell-green);
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-top: 0.25rem;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--wortell-dark-gray);
+    }
+    
+    .section-title i {
+        margin-right: 0.5rem;
+        color: var(--wortell-blue);
+    }
+
+    .talent-showcase {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        overflow: hidden;
+        border-left: 4px solid var(--wortell-blue);
+    }
+
+    .talent-carousel {
+        display: flex;
+        gap: 1rem;
+        padding: 0.5rem 0;
+        animation: scrollTalent 60s linear infinite;
+        width: max-content;
+    }
+
+    .talent-item {
+        display: flex;
+        align-items: center;
+        background: var(--wortell-gray);
+        padding: 0.75rem 1rem;
+        border-radius: 50px;
+        min-width: 200px;
+        transition: all 0.3s ease;
+    }
+    
+    .talent-item:hover {
+        background: var(--light-bg);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    .talent-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--wortell-blue);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 0.75rem;
+    }
+
+    .talent-name {
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+    }
+
+    .talent-skill {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-left: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .skills-section {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        animation: fadeIn 0.8s ease-out;
+        border-left: 4px solid var(--wortell-green);
+    }
+
+    .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .skill-card {
+        background: var(--light-bg);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        transition: all 0.3s ease;
+        animation: slideIn 0.5s ease-out forwards;
+        opacity: 0;
+    }
+    
+    .skill-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .skill-name {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+        line-height: 1.2;
+        word-break: break-word;
+        hyphens: auto;
+    }
+    
+    .skill-icon {
+        margin-right: 8px;
+        font-size: 1.2rem;
+        color: var(--wortell-blue);
+        flex-shrink: 0;
+    }
+
+    .skill-count {
+        color: var(--wortell-blue);
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .percentage-bar {
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+
+    .percentage-fill {
+        height: 100%;
+        background: var(--wortell-green);
+        border-radius: 3px;
+        width: 0;
+        transition: width 1.5s ease;
+    }
+
+    .recent-activity {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--wortell-purple);
+    }
+
+    .activity-item {
+        display: flex;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--wortell-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: var(--wortell-blue);
+    }
+
+    .activity-title {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .activity-description {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+    }
+
+    .activity-time {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+    
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes scrollTalent {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    
+    /* Apply animation delay to skill cards */
+    {% for i in range(10) %}
+    .skill-card:nth-child({{ i + 1 }}) {
+        animation-delay: {{ i * 0.1 }}s;
+    }
+    {% endfor %}
+
+    /* Pause animation on hover */
+    .talent-showcase:hover .talent-carousel {
+        animation-play-state: paused;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Banner - updated to exactly match candidates.html container structure -->
+    <div class="welcome-banner mb-4">
+        <h2 class="page-title">Dashboard</h2>
+        <p>Uw intelligente recruitment assistent die u helpt de perfecte match te vinden voor uw vacatures. Analyseer CV's, match kandidaten met vacatures en ontdek toptalent met gemak.</p>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+        </nav>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="d-flex justify-content-end mb-4">
+        <a href="{{ url_for('upload_page') }}" class="btn btn-primary">
+            <i class="bi bi-upload me-2"></i>
+            Nieuwe CV's Uploaden
+        </a>
+    </div>
+
+    <!-- Key Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number animate-number" data-value="{{ total_candidates }}">0</div>
+            <div class="stat-label">Totaal Kandidaten</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number animate-number" data-value="{{ unique_skills }}">0</div>
+            <div class="stat-label">Unieke Vaardigheden</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Meest Ervaren Vaardigheid</div>
+            <div class="stat-highlight">{{ most_experienced_skill.name }}</div>
+            <div class="stat-sublabel">{{ most_experienced_skill.years }} jaar gem.</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Meest Vaardige Kandidaat</div>
+            <div class="stat-highlight">{{ most_skilled_candidate.name }}</div>
+            <div class="stat-sublabel">{{ most_skilled_candidate.count }} vaardigheden</div>
+        </div>
+    </div>
+
+    <!-- Talent Showcase -->
+    {% if top_candidates %}
+    <div class="talent-showcase">
+        <h5 class="section-title"><i class="bi bi-people-fill"></i>Talent Showcase</h5>
+        <div class="talent-carousel">
+            {% for candidate in top_candidates %}
+                <div class="talent-item">
+                    <div class="talent-avatar">{{ candidate.name[0]|upper }}</div>
+                    <div class="talent-name">{{ candidate.name }}</div>
+                    <div class="talent-skill">• {{ candidate.top_skill }}</div>
+                </div>
+            {% endfor %}
+            <!-- Duplicate items for seamless looping -->
+            {% for candidate in top_candidates %}
+                <div class="talent-item">
+                    <div class="talent-avatar">{{ candidate.name[0]|upper }}</div>
+                    <div class="talent-name">{{ candidate.name }}</div>
+                    <div class="talent-skill">• {{ candidate.top_skill }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Top Skills -->
+    {% if top_skills %}
+    <div class="skills-section">
+        <h5 class="section-title"><i class="bi bi-bar-chart-fill"></i>Meest Gevraagde Vaardigheden</h5>
+        <div class="skills-grid">
+            {% for skill in top_skills %}
+            <div class="skill-card">
+                <div class="skill-name">
+                    <span class="skill-icon">
+                        <i class="bi bi-{{ ['code-slash', 'laptop', 'braces', 'diagram-3', 'database', 'server', 'diagram-2', 'gear', 'layers', 'cloud']|random }}"></i>
+                    </span>
+                    {{ skill.name }}
+                </div>
+                <div class="skill-count">{{ skill.count }}</div>
+                <div class="percentage-bar">
+                    <div class="percentage-fill" data-width="{{ skill.percentage }}"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Activity -->
+    {% if recent_activities %}
+    <div class="recent-activity">
+        <h5 class="section-title"><i class="bi bi-activity"></i>Recente Activiteit</h5>
+        
+        {% for activity in recent_activities %}
+        <div class="activity-item">
+            <div class="activity-icon">
+                <i class="bi bi-{{ activity.icon }}"></i>
+            </div>
+            <div class="activity-content">
+                <div class="activity-title">{{ activity.title }}</div>
+                <div class="activity-description">{{ activity.description }}</div>
+                <div class="activity-time">{{ activity.time }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate the number counters
+        const numberElements = document.querySelectorAll('.animate-number');
+        numberElements.forEach(el => {
+            const targetValue = parseInt(el.getAttribute('data-value'));
+            if (isNaN(targetValue)) {
+                el.textContent = "0";
+                return;
+            }
+            
+            const duration = 1500; // ms
+            const frameDuration = 1000/60; // 60fps
+            const totalFrames = Math.round(duration / frameDuration);
+            let frame = 0;
+            
+            const counter = setInterval(() => {
+                frame++;
+                const progress = frame / totalFrames;
+                const currentValue = Math.round(targetValue * progress);
+                
+                el.textContent = currentValue;
+                
+                if (frame === totalFrames) {
+                    clearInterval(counter);
+                    el.textContent = targetValue;
+                }
+            }, frameDuration);
+        });
+        
+        // Animate the percentage bars
+        const percentageFills = document.querySelectorAll('.percentage-fill');
+        setTimeout(() => {
+            percentageFills.forEach(fill => {
+                const width = fill.getAttribute('data-width') + '%';
+                fill.style.width = width;
+            });
+        }, 300);
+    });
+</script>
+{% endblock %}

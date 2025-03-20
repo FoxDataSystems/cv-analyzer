@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ candidate.name }} - CV Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #00D66C;
+            --primary-dark: #00b85d;
+            --primary-light: #33db84;
+            --secondary-color: #6C1F85;
+            --secondary-dark: #591a6d;
+            --secondary-light: #8229a0;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --text-color: #2c2c2c;
+            --light-text: #f8f9fa;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            box-shadow: var(--box-shadow);
+            background-color: #fff !important;
+            padding: 12px 0;
+            margin-bottom: 2rem;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-color);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-color);
+            opacity: 0.8;
+            transition: var(--transition);
+            padding: 0.5rem 1rem !important;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+            opacity: 1;
+        }
+
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            opacity: 1;
+        }
+
+        .card {
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: none;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 14px 18px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+
+        .btn {
+            border-radius: var(--border-radius);
+            padding: 8px 16px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--light-text);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-info {
+            background-color: var(--primary-light);
+            border-color: var(--primary-light);
+            color: var(--light-text);
+        }
+
+        .btn-info:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-warning {
+            background-color: var(--secondary-light);
+            border-color: var(--secondary-light);
+            color: var(--light-text);
+        }
+
+        .btn-warning:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .skill-badge {
+            background-color: var(--primary-light);
+            color: var(--light-text);
+            border-radius: var(--border-radius);
+            padding: 4px 8px;
+            margin: 2px;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .experience-years {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .candidate-header {
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .candidate-name {
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .contact-info {
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .page-title {
+            font-weight: 300;
+            color: #333;
+            margin-bottom: 25px;
+        }
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .breadcrumb-item.active {
+            color: #666;
+        }
+        .text-muted {
+            color: #6c757d !important;
+        }
+        pre {
+            border-radius: 8px;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .profile-header {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .skills-section {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+
+        .skill-card {
+            background: var(--light-bg);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .experience-timeline {
+            padding: 1.5rem;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            padding-bottom: 2rem;
+            border-left: 2px solid var(--primary-light);
+        }
+
+        .timeline-item:last-child {
+            border-left: none;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary-color);
+        }
+
+        .cv-text-section {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        .cv-text-content {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: var(--light-bg);
+            font-family: monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">CV Analyzer</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" 
+                           href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'view_candidates' %}active{% endif %}" 
+                           href="{{ url_for('view_candidates') }}">Smarties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'upload_page' %}active{% endif %}" 
+                           href="{{ url_for('upload_page') }}">Upload CVs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'vacancy_match' %}active{% endif %}" 
+                           href="{{ url_for('vacancy_match') }}">Vacature Match</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'skill_search' %}active{% endif %}" 
+                           href="{{ url_for('skill_search') }}">Skill Search</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="profile-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="mb-2">{{ candidate.name }}</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ url_for('view_candidates') }}">Candidates</a></li>
+                            <li class="breadcrumb-item active">{{ candidate.name }}</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('edit_candidate', candidate_id=candidate.id) }}" class="btn btn-primary">
+                        <i class="bi bi-pencil me-2"></i>Edit
+                    </a>
+                    <form method="post" action="{{ url_for('delete_candidate', candidate_id=candidate.id) }}" id="deleteForm" class="d-inline">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bi bi-trash me-2"></i>Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="profile-info">
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted">Email</div>
+                        <div>{{ candidate.email }}</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="bi bi-telephone"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted">Phone</div>
+                        <div>{{ candidate.phone }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="skills-section mb-4">
+                    <div class="section-header">
+                        <h5 class="mb-0">Skills</h5>
+                    </div>
+                    <div class="skill-grid">
+                        {% for skill in skills %}
+                            <div class="skill-card">
+                                <div>
+                                    <div class="fw-bold">{{ skill.skill_name }}</div>
+                                    <small class="text-muted">{{ skill.years_experience }} years</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="skills-section">
+                    <div class="section-header">
+                        <h5 class="mb-0">Work Experience</h5>
+                    </div>
+                    <div class="experience-timeline">
+                        {% for exp in work_experience %}
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="mb-2">
+                                    <h6 class="mb-1">{{ exp.position }}</h6>
+                                    <div class="text-muted">{{ exp.company }}</div>
+                                    <small class="text-muted">{{ exp.start_date }} - {{ exp.end_date }}</small>
+                                </div>
+                                <p class="mb-0">{{ exp.description }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="skills-section">
+                    <div class="section-header">
+                        <h5 class="mb-0">Certifications & Training</h5>
+                    </div>
+                    <div class="experience-timeline">
+                        {% for cert in certificates %}
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="mb-2">
+                                    <h6 class="mb-1">{{ cert.name }}</h6>
+                                    <div class="text-muted">{{ cert.issuer }}</div>
+                                    <small class="text-muted">Obtained: {{ cert.date_obtained }}
+                                    {% if cert.expiry_date %}
+                                        | Expires: {{ cert.expiry_date }}
+                                    {% endif %}
+                                    </small>
+                                </div>
+                                {% if cert.description %}
+                                    <p class="mb-0">{{ cert.description }}</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="cv-text-section">
+                    <div class="section-header">
+                        <h5 class="mb-0">Original CV Text</h5>
+                        <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#cvText">
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="collapse" id="cvText">
+                        <div class="cv-text-content">{{ candidate.cv_text }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete <strong>{{ candidate.name }}</strong>? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger" form="deleteForm">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set up the delete modal
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const candidateId = button.getAttribute('data-candidate-id');
+                const candidateName = button.getAttribute('data-candidate-name');
+                
+                document.getElementById('candidateName').textContent = candidateName;
+                document.getElementById('deleteForm').action = '/candidate/delete/' + candidateId;
+            });
+        }
+    </script>
+</body>
+</html> 

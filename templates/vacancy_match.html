@@ -1,0 +1,1431 @@
+{% extends "base.html" %}
+
+{% block title %}Vacature Matching - CV Analyzer{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --wortell-blue: #0078D4;
+        --wortell-dark-blue: #005A9E;
+        --wortell-light-blue: #50A0D2;
+        --wortell-green: #00D66C;
+        --wortell-dark-green: #00B85D;
+        --wortell-light-green: #33DB84;
+        --wortell-purple: #6C1F85;
+        --wortell-gray: #F3F3F3;
+        --wortell-dark-gray: #333333;
+        
+        --primary-color: var(--wortell-green);
+        --primary-dark: var(--wortell-dark-green);
+        --primary-light: var(--wortell-light-green);
+        --secondary-color: var(--wortell-blue);
+        --secondary-dark: var(--wortell-dark-blue);
+        --secondary-light: var(--wortell-light-blue);
+        --accent-color: var(--wortell-purple);
+        --light-bg: #f8f9fa;
+        --dark-bg: #212529;
+        --text-color: #2c2c2c;
+        --light-text: #f8f9fa;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+    
+    body {
+        background-color: var(--light-bg);
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+    
+   
+    
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(135deg, var(--wortell-green) 0%, var(--wortell-blue) 100%);
+        color: white;
+        padding: 2.5rem 0 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .page-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item a:hover {
+        color: white;
+    }
+    
+    .breadcrumb-item.active {
+        color: white;
+    }
+    
+    .breadcrumb-item+.breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Cards */
+    .card {
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        border: none;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    
+    .card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+    
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+    }
+    
+    .card-header.bg-primary {
+        background: linear-gradient(45deg, var(--primary-color), var(--primary-dark)) !important;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    /* Form Elements */
+    .form-control {
+        border-radius: var(--border-radius);
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        transition: var(--transition);
+        font-size: 1rem;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(0, 214, 108, 0.25);
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+    }
+    
+    textarea.form-control {
+        min-height: 160px;
+        resize: vertical;
+    }
+    
+    /* Buttons */
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 0.6rem 1.25rem;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 214, 108, 0.2);
+    }
+    
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 214, 108, 0.3);
+    }
+    
+    .btn-secondary {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        color: white;
+        box-shadow: 0 2px 4px rgba(0, 120, 212, 0.2);
+    }
+    
+    .btn-secondary:hover, .btn-secondary:focus {
+        background-color: var(--secondary-dark);
+        border-color: var(--secondary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 120, 212, 0.3);
+    }
+    
+    .btn-info {
+        background-color: var(--secondary-light);
+        border-color: var(--secondary-light);
+        color: white !important;
+        box-shadow: 0 2px 4px rgba(80, 160, 210, 0.2);
+    }
+    
+    .btn-info:hover, .btn-info:focus {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(80, 160, 210, 0.3);
+    }
+    
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-outline-primary:hover, .btn-outline-primary:focus {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-secondary {
+        color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+    
+    .btn-outline-secondary:hover, .btn-outline-secondary:focus {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Progress Bars */
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #e9ecef;
+        margin: 4px 0;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        border-radius: 4px;
+        transition: width 0.6s ease;
+    }
+    
+    .progress-bar.bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+    
+    .progress-bar.bg-info {
+        background-color: var(--secondary-light) !important;
+    }
+    
+    /* Match Score */
+    .match-score {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        line-height: 1.2;
+    }
+    
+    /* Skills Container */
+    .skills-container {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e9ecef;
+        box-shadow: var(--box-shadow);
+        background-color: white;
+    }
+    
+    .skills-header {
+        background-color: var(--wortell-gray);
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .skills-header h5 {
+        margin: 0;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .skills-header .required-title {
+        color: var(--primary-color);
+    }
+    
+    .skills-header .nice-title {
+        color: var(--secondary-color);
+    }
+    
+    .skills-body {
+        background: white;
+        max-height: 320px;
+        overflow-y: auto;
+        position: relative;
+    }
+    
+    /* Skill List */
+    .skill-list {
+        max-height: 320px;
+        overflow-y: auto;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+    }
+    
+    .skill-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.875rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        background-color: #fff;
+        transition: background-color 0.2s;
+    }
+    
+    .skill-item:last-child {
+        border-bottom: none;
+    }
+    
+    .skill-item:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+    
+    .skill-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .skill-name {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .skill-years {
+        background-color: var(--wortell-gray);
+        padding: 0.25rem 0.6rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        color: var(--wortell-dark-gray);
+        font-weight: 500;
+    }
+    
+    .skill-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: transparent;
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        transition: all 0.15s;
+    }
+    
+    .btn-action:hover {
+        background-color: var(--wortell-gray);
+        transform: translateY(-2px);
+    }
+    
+    .btn-edit:hover {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-move:hover {
+        color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+    
+    .btn-delete:hover {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 2.5rem 1.5rem;
+        color: #adb5bd;
+    }
+    
+    .empty-state i {
+        font-size: 2rem;
+        opacity: 0.5;
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .empty-state p {
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+    
+    /* Apply Changes Button */
+    .apply-changes-container {
+        text-align: center;
+        margin: 1.5rem 0 1rem;
+    }
+    
+    .btn-apply {
+        padding: 0.75rem 2.5rem;
+        font-weight: 600;
+        border-radius: var(--border-radius);
+        background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 214, 108, 0.25);
+    }
+    
+    .btn-apply:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 18px rgba(0, 214, 108, 0.35);
+        background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+    }
+    
+    /* Candidate Cards */
+    .candidate-card {
+        border-radius: var(--border-radius);
+        background-color: white;
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        height: 100%;
+        transition: var(--transition);
+        border-top: 4px solid var(--primary-color);
+    }
+    
+    .candidate-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    }
+    
+    /* Scrollbar styling */
+    .skill-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .skill-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    .skill-list::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    .skill-list::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+    
+    /* Animation for adding/removing skills */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .skill-item-adding {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    @keyframes fadeOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-10px); }
+    }
+    
+    .skill-item-removing {
+        animation: fadeOut 0.3s ease-out forwards;
+    }
+    
+    /* Badge Styling */
+    .badge {
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        border-radius: 50px;
+    }
+    
+    /* Loading Animation */
+    .loading-indicator {
+        display: flex;
+        align-items: center;
+        color: var(--wortell-dark-gray);
+    }
+    
+    /* No Results Found */
+    .no-results {
+        text-align: center;
+        padding: 3rem 1.5rem;
+    }
+    
+    .no-results i {
+        font-size: 3.5rem;
+        color: #dee2e6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .no-results h5 {
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .no-results p {
+        color: #6c757d;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    /* Dashboard-style welcome banner */
+    .welcome-banner {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #7cd3c7 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+    }
+
+    .welcome-banner h2 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-banner p {
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+        max-width: 600px;
+    }
+    
+    .welcome-banner .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .welcome-banner .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+    }
+    
+    .welcome-banner .breadcrumb-item a:hover {
+        color: white;
+    }
+    
+    .welcome-banner .breadcrumb-item.active {
+        color: white;
+    }
+    
+    .welcome-banner .breadcrumb-item+.breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Condensed details table styling */
+    .details-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        font-size: 0.875rem; /* Smaller font size */
+    }
+    
+    .details-table th, 
+    .details-table td {
+        padding: 0.6rem 0.75rem; /* Reduced padding */
+        vertical-align: middle;
+    }
+    
+    .details-table th {
+        font-weight: 600;
+        color: var(--text-color);
+        background-color: var(--wortell-gray);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        font-size: 0.85rem;
+    }
+    
+    .details-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+    
+    .details-table tbody tr:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+    
+    .details-table td {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .details-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    /* Condensed status badges styling */
+    .status-badge {
+        padding: 0.35rem 0.5rem; /* Smaller padding */
+        font-weight: 500;
+        display: inline-block;
+        text-align: center;
+        min-width: 90px;
+        font-size: 0.8rem;
+    }
+    
+    /* Condensed skill type styling */
+    .skill-type {
+        font-weight: 500;
+        color: var(--text-color);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.85rem;
+    }
+    
+    .skill-type i.required {
+        color: var(--primary-color);
+    }
+    
+    .skill-type i.nice {
+        color: var(--secondary-color);
+    }
+    
+    /* Condensed skill name styling */
+    .skill-name-cell {
+        font-weight: 600;
+        color: var(--text-color);
+        font-size: 0.85rem;
+    }
+    
+    /* Condensed skill details/reason cell */
+    .details-reason {
+        color: #6c757d;
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+    
+    /* Details box styling */
+    .details-box {
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-top: 1rem;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="welcome-banner mb-4">
+    <h2 class="page-title">Vacature Matching</h2>
+    <p>Match vacatureteksten met kandidaten om de perfecte fit voor jouw posities te vinden.</p>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Vacature Matching</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form method="POST" id="vacancy-form">
+                    <div class="mb-4">
+                        <label for="vacancy_text" class="form-label h5 mb-3">Vacaturetekst</label>
+                        <p class="text-muted mb-3">Plak de vacaturetekst hieronder om benodigde vaardigheden te analyseren en passende kandidaten te vinden.</p>
+                        <textarea class="form-control" id="vacancy_text" name="vacancy_text" rows="8" placeholder="Plak vacaturetekst hier..." required>{{ vacancy_text if vacancy_text }}</textarea>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button type="submit" class="btn btn-primary px-4" id="find-matches-btn">
+                            <i class="bi bi-search"></i>Zoek Matches
+                        </button>
+                        <div id="loading-indicator" class="loading-indicator ms-3 d-none">
+                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                <span class="visually-hidden">Laden...</span>
+                            </div>
+                            <span class="text-muted">Vacaturetekst analyseren...</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if show_results %}
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0"><i class="bi bi-gear-fill me-2"></i>Vaardigheden Analyse</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="skills-container">
+                                        <div class="skills-header">
+                                            <div>
+                                                <h5><i class="bi bi-star-fill text-primary"></i>Vereiste Vaardigheden</h5>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-primary" id="required-count">0</span>
+                                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRequiredSkillModal">
+                                                    <i class="bi bi-plus-lg"></i> Toevoegen
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="required-skills-list" class="skill-list">
+                                            <!-- Skills will be added here dynamically -->
+                                            <div class="empty-state">
+                                                <i class="bi bi-clipboard-check"></i>
+                                                <p>Nog geen vereiste vaardigheden toegevoegd</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="skills-container">
+                                        <div class="skills-header">
+                                            <div>
+                                                <h5><i class="bi bi-plus-circle text-info"></i>Gewenste Vaardigheden</h5>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-info" id="nice-count">0</span>
+                                                <button type="button" class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#addNiceSkillModal">
+                                                    <i class="bi bi-plus-lg"></i> Toevoegen
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="nice-skills-list" class="skill-list">
+                                            <!-- Skills will be added here dynamically -->
+                                            <div class="empty-state">
+                                                <i class="bi bi-clipboard-plus"></i>
+                                                <p>Nog geen gewenste vaardigheden toegevoegd</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="apply-changes-container">
+                                <button type="button" id="apply-changes" class="btn btn-success btn-apply">
+                                    <i class="bi bi-check-circle"></i>Wijzigingen Toepassen & Matches Zoeken
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-people-fill me-2"></i>Matchende Kandidaten
+                            </h5>
+                            {% if matches %}
+                                <span class="badge bg-primary">{{ matches|length }} kandidaten gevonden</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body p-4" id="match-results">
+                            {% if matches %}
+                                <div class="row">
+                                    {% for match in matches %}
+                                        <div class="col-md-6 mb-4">
+                                            <div class="candidate-card">
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <div>
+                                                        <h5 class="mb-1">{{ match.name }}</h5>
+                                                        <p class="text-muted mb-0">
+                                                            <i class="bi bi-envelope me-2"></i>{{ match.email }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <div class="match-score">{{ match.match_percentage }}%</div>
+                                                        <span class="badge bg-{{ 'success' if match.match_percentage >= 70 else 'warning' if match.match_percentage >= 50 else 'danger' }}">
+                                                            {{ 'Sterke Match' if match.match_percentage >= 70 else 'Potentiële Match' if match.match_percentage >= 50 else 'Lage Match' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="skills-match mb-3">
+                                                    <div class="mb-2">
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <label class="form-label small mb-0">Vereiste Vaardigheden</label>
+                                                            <small class="text-muted">{{ match.required_match }}%</small>
+                                                        </div>
+                                                        <div class="progress">
+                                                            <div class="progress-bar bg-primary" role="progressbar" 
+                                                                 style="width: {{ match.required_match }}%" 
+                                                                 aria-valuenow="{{ match.required_match }}" 
+                                                                 aria-valuemin="0" 
+                                                                 aria-valuemax="100"></div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div>
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <label class="form-label small mb-0">Gewenste Vaardigheden</label>
+                                                            <small class="text-muted">{{ match.nice_to_have_match }}%</small>
+                                                        </div>
+                                                        <div class="progress">
+                                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                                 style="width: {{ match.nice_to_have_match }}%" 
+                                                                 aria-valuenow="{{ match.nice_to_have_match }}" 
+                                                                 aria-valuemin="0" 
+                                                                 aria-valuemax="100"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-between">
+                                                    <a href="{{ url_for('view_candidate', candidate_id=match.candidate_id) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye me-1"></i>Profiel Bekijken
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" 
+                                                            data-bs-target="#details-{{ match.candidate_id }}">
+                                                        <i class="bi bi-list-check me-1"></i>Details Bekijken
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="collapse mt-3" id="details-{{ match.candidate_id }}">
+                                                    <div class="details-box">
+                                                        <table class="table table-hover mb-0 details-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width="25%">Vaardigheid</th>
+                                                                    <th width="15%">Type</th>
+                                                                    <th width="15%">Status</th>
+                                                                    <th width="45%">Details</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {% for detail in match.details|sort(attribute='match', reverse=True) %}
+                                                                    <tr>
+                                                                        <td class="skill-name-cell">{{ detail.skill_name }}</td>
+                                                                        <td>
+                                                                            <span class="skill-type">
+                                                                                <i class="bi bi-{{ 'star-fill required' if detail.type == 'Required' else 'plus-circle nice' }}"></i>
+                                                                                {{ 'Vereist' if detail.type == 'Required' else 'Gewenst' }}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="badge status-badge {{ 'bg-success' if detail.match else 'bg-danger' }}">
+                                                                                {{ 'Gevonden' if detail.match else 'Niet Gevonden' }}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td class="details-reason">{{ detail.reason }}</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="no-results">
+                                    <i class="bi bi-search"></i>
+                                    <h5>Geen Matches Gevonden</h5>
+                                    <p>Pas de vereiste vaardigheden of vacaturetekst aan om meer kandidaten te vinden.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Required Skill Modal -->
+<div class="modal fade" id="addRequiredSkillModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-star-fill text-primary me-2"></i>Vereiste Vaardigheid Toevoegen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="required-skill-name" class="form-label">Vaardigheid Naam</label>
+                    <input type="text" class="form-control" id="required-skill-name" placeholder="bijv. Python, AWS, Project Management">
+                    <div class="invalid-feedback">Voer een vaardigheidsnaam in</div>
+                </div>
+                <div class="mb-3">
+                    <label for="required-skill-years" class="form-label">Jaren Ervaring</label>
+                    <input type="number" class="form-control" id="required-skill-years" min="0" step="0.5" value="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuleren</button>
+                <button type="button" class="btn btn-primary" id="save-required-skill">
+                    <i class="bi bi-plus-lg me-1"></i>Vaardigheid Toevoegen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Nice to Have Skill Modal -->
+<div class="modal fade" id="addNiceSkillModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle text-info me-2"></i>Gewenste Vaardigheid Toevoegen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="nice-skill-name" class="form-label">Vaardigheid Naam</label>
+                    <input type="text" class="form-control" id="nice-skill-name" placeholder="bijv. Python, AWS, Project Management">
+                    <div class="invalid-feedback">Voer een vaardigheidsnaam in</div>
+                </div>
+                <div class="mb-3">
+                    <label for="nice-skill-years" class="form-label">Jaren Ervaring</label>
+                    <input type="number" class="form-control" id="nice-skill-years" min="0" step="0.5" value="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuleren</button>
+                <button type="button" class="btn btn-info text-white" id="save-nice-skill">
+                    <i class="bi bi-plus-lg me-1"></i>Vaardigheid Toevoegen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Skill Modal -->
+<div class="modal fade" id="editSkillModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Vaardigheid Bewerken</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-skill-id">
+                <input type="hidden" id="edit-skill-type">
+                <div class="mb-3">
+                    <label for="edit-skill-name" class="form-label">Vaardigheid Naam</label>
+                    <input type="text" class="form-control" id="edit-skill-name">
+                    <div class="invalid-feedback">Voer een vaardigheidsnaam in</div>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-skill-years" class="form-label">Jaren Ervaring</label>
+                    <input type="number" class="form-control" id="edit-skill-years" min="0" step="0.5" value="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuleren</button>
+                <button type="button" class="btn btn-primary" id="update-skill">
+                    <i class="bi bi-check-lg me-1"></i>Wijzigingen Opslaan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show loading indicator when form is submitted
+    document.getElementById('vacancy-form').addEventListener('submit', function(e) {
+        document.getElementById('find-matches-btn').disabled = true;
+        document.getElementById('loading-indicator').classList.remove('d-none');
+    });
+    
+    // Initialize skill counters
+    let requiredSkillCount = 0;
+    let niceSkillCount = 0;
+    
+    // Get DOM elements
+    const requiredSkillsList = document.getElementById('required-skills-list');
+    const niceSkillsList = document.getElementById('nice-skills-list');
+    const requiredCountBadge = document.getElementById('required-count');
+    const niceCountBadge = document.getElementById('nice-count');
+    
+    // Modal elements
+    const addRequiredSkillModal = new bootstrap.Modal(document.getElementById('addRequiredSkillModal'));
+    const addNiceSkillModal = new bootstrap.Modal(document.getElementById('addNiceSkillModal'));
+    const editSkillModal = new bootstrap.Modal(document.getElementById('editSkillModal'));
+    
+    // Add required skill
+    document.getElementById('save-required-skill').addEventListener('click', function() {
+        const skillNameInput = document.getElementById('required-skill-name');
+        const skillName = skillNameInput.value.trim();
+        
+        if (!skillName) {
+            skillNameInput.classList.add('is-invalid');
+            return;
+        }
+        
+        const years = parseFloat(document.getElementById('required-skill-years').value) || 0;
+        
+        addSkill('required', skillName, years);
+        
+        // Clear inputs and close modal
+        skillNameInput.value = '';
+        document.getElementById('required-skill-years').value = 0;
+        skillNameInput.classList.remove('is-invalid');
+        addRequiredSkillModal.hide();
+    });
+    
+    // Add nice to have skill
+    document.getElementById('save-nice-skill').addEventListener('click', function() {
+        const skillNameInput = document.getElementById('nice-skill-name');
+        const skillName = skillNameInput.value.trim();
+        
+        if (!skillName) {
+            skillNameInput.classList.add('is-invalid');
+            return;
+        }
+        
+        const years = parseFloat(document.getElementById('nice-skill-years').value) || 0;
+        
+        addSkill('nice', skillName, years);
+        
+        // Clear inputs and close modal
+        skillNameInput.value = '';
+        document.getElementById('nice-skill-years').value = 0;
+        skillNameInput.classList.remove('is-invalid');
+        addNiceSkillModal.hide();
+    });
+    
+    // Update skill
+    document.getElementById('update-skill').addEventListener('click', function() {
+        const skillId = document.getElementById('edit-skill-id').value;
+        const skillType = document.getElementById('edit-skill-type').value;
+        const skillNameInput = document.getElementById('edit-skill-name');
+        const skillName = skillNameInput.value.trim();
+        
+        if (!skillName) {
+            skillNameInput.classList.add('is-invalid');
+            return;
+        }
+        
+        const years = parseFloat(document.getElementById('edit-skill-years').value) || 0;
+        
+        // Find the skill item
+        const skillItem = document.getElementById(skillId);
+        if (skillItem) {
+            // Update the skill data
+            skillItem.dataset.name = skillName;
+            skillItem.dataset.years = years;
+            
+            // Update the displayed text
+            skillItem.querySelector('.skill-name').textContent = skillName;
+            skillItem.querySelector('.skill-years').textContent = years + (years === 1 ? ' year' : ' years');
+        }
+        
+        editSkillModal.hide();
+    });
+    
+    // Add a skill to the specified list
+    function addSkill(type, skillName, years) {
+        if (!skillName || skillName.trim() === '') return;
+        
+        const skillsList = type === 'required' ? requiredSkillsList : niceSkillsList;
+        const skillId = 'skill-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        
+        // Remove empty state if present
+        const emptyState = skillsList.querySelector('.empty-state');
+        if (emptyState) {
+            emptyState.remove();
+        }
+        
+        // Create skill item
+        const skillItem = document.createElement('div');
+        skillItem.className = 'skill-item skill-item-adding';
+        skillItem.id = skillId;
+        skillItem.dataset.name = skillName;
+        skillItem.dataset.years = years;
+        skillItem.dataset.type = type;
+        
+        skillItem.innerHTML = `
+            <div class="skill-info">
+                <div class="skill-name">${skillName}</div>
+                <div class="skill-years">${years} ${years === 1 ? 'year' : 'years'}</div>
+            </div>
+            <div class="skill-actions">
+                <button type="button" class="btn btn-action btn-edit" onclick="editSkill('${skillId}')">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button type="button" class="btn btn-action btn-move" 
+                        onclick="moveSkill(this, '${type === 'required' ? 'nice' : 'required'}')">
+                    <i class="bi bi-${type === 'required' ? 'arrow-right' : 'arrow-left'}"></i>
+                </button>
+                <button type="button" class="btn btn-action btn-delete" onclick="deleteSkill('${skillId}', '${type}')">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        skillsList.appendChild(skillItem);
+        
+        // Update counter
+        if (type === 'required') {
+            requiredSkillCount++;
+            requiredCountBadge.textContent = requiredSkillCount;
+        } else {
+            niceSkillCount++;
+            niceCountBadge.textContent = niceSkillCount;
+        }
+        
+        // Remove animation class after animation completes
+        setTimeout(() => {
+            skillItem.classList.remove('skill-item-adding');
+        }, 300);
+        
+        return skillId;
+    }
+    
+    // Make functions available globally
+    window.editSkill = function(skillId) {
+        const skillItem = document.getElementById(skillId);
+        if (!skillItem) return;
+        
+        const skillName = skillItem.dataset.name;
+        const years = skillItem.dataset.years;
+        
+        // Populate the edit modal
+        document.getElementById('edit-skill-id').value = skillId;
+        document.getElementById('edit-skill-type').value = skillItem.dataset.type;
+        document.getElementById('edit-skill-name').value = skillName;
+        document.getElementById('edit-skill-years').value = years;
+        
+        // Show the modal
+        editSkillModal.show();
+    };
+    
+    // Move skill between required and nice-to-have lists
+    window.moveSkill = function(button, targetType) {
+        const skillItem = button.closest('.skill-item');
+        const skillId = skillItem.id;
+        const skillName = skillItem.dataset.name;
+        const skillYears = skillItem.dataset.years;
+        const currentType = skillItem.dataset.type;
+        
+        // Don't do anything if trying to move to the same type
+        if (currentType === targetType) return;
+        
+        // First add to the target list
+        addSkill(targetType, skillName, skillYears);
+        
+        // Then remove from the current list
+        deleteSkill(skillId, currentType);
+    };
+    
+    window.deleteSkill = function(skillId, type) {
+        const skillItem = document.getElementById(skillId);
+        if (!skillItem) return;
+        
+        // Add removing animation class
+        skillItem.classList.add('skill-item-removing');
+        
+        // Remove after animation completes
+        setTimeout(() => {
+            skillItem.remove();
+            
+            // Update counter
+            if (type === 'required') {
+                requiredSkillCount--;
+                requiredCountBadge.textContent = requiredSkillCount;
+                
+                // Add empty state if no skills left
+                if (requiredSkillCount === 0) {
+                    requiredSkillsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-clipboard-check"></i>
+                            <p>Nog geen vereiste vaardigheden toegevoegd</p>
+                        </div>
+                    `;
+                }
+            } else {
+                niceSkillCount--;
+                niceCountBadge.textContent = niceSkillCount;
+                
+                // Add empty state if no skills left
+                if (niceSkillCount === 0) {
+                    niceSkillsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-clipboard-plus"></i>
+                            <p>Nog geen gewenste vaardigheden toegevoegd</p>
+                        </div>
+                    `;
+                }
+            }
+        }, 300);
+    };
+    
+    // Apply changes button
+    document.getElementById('apply-changes').addEventListener('click', function() {
+        // Collect all skills
+        const requiredSkills = Array.from(document.querySelectorAll('#required-skills-list .skill-item')).map(item => ({
+            skill_name: item.dataset.name,
+            years_experience: parseFloat(item.dataset.years) || 0
+        }));
+        
+        const niceToHaveSkills = Array.from(document.querySelectorAll('#nice-skills-list .skill-item')).map(item => ({
+            skill_name: item.dataset.name,
+            years_experience: parseFloat(item.dataset.years) || 0
+        }));
+        
+        // Show loading indicator
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Recalculating...';
+        
+        const matchResults = document.getElementById('match-results');
+        matchResults.innerHTML = `
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="text-muted">Recalculating matches...</p>
+            </div>
+        `;
+        
+        // Send updated skills to the server for recalculation
+        fetch('{{ url_for("vacancy_match") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                vacancy_text: document.getElementById('vacancy_text').value,
+                required_skills: requiredSkills,
+                nice_to_have_skills: niceToHaveSkills
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update the match results
+            this.disabled = false;
+            this.innerHTML = '<i class="bi bi-check-circle me-2"></i>Apply Changes & Find Matches';
+            
+            // Instead of using the HTML from the server, build the results directly
+            if (data.matches && data.matches.length > 0) {
+                let resultsHtml = '<div class="row">';
+                
+                data.matches.forEach(match => {
+                    // Sort details: matched skills first, then not matched
+                    const sortedDetails = [...match.details].sort((a, b) => {
+                        // First sort by match status (matched first)
+                        if (a.match && !b.match) return -1;
+                        if (!a.match && b.match) return 1;
+                        
+                        // Then sort by type (required first)
+                        if (a.type === 'Required' && b.type !== 'Required') return -1;
+                        if (a.type !== 'Required' && b.type === 'Required') return 1;
+                        
+                        // Then sort alphabetically by skill name
+                        return a.skill_name.localeCompare(b.skill_name);
+                    });
+                    
+                    resultsHtml += `
+                        <div class="col-md-6 mb-4">
+                            <div class="candidate-card">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="mb-1">${match.name}</h5>
+                                        <p class="text-muted mb-0">
+                                            <i class="bi bi-envelope me-2"></i>${match.email}
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="match-score">${match.match_percentage}%</div>
+                                        <span class="badge bg-${match.match_percentage >= 70 ? 'success' : match.match_percentage >= 50 ? 'warning' : 'danger'}">
+                                            ${match.match_percentage >= 70 ? 'Sterke Match' : match.match_percentage >= 50 ? 'Potentiële Match' : 'Lage Match'}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="skills-match mb-3">
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label small mb-0">Vereiste Vaardigheden</label>
+                                            <small class="text-muted">${match.required_match}%</small>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" role="progressbar" 
+                                                 style="width: ${match.required_match}%" 
+                                                 aria-valuenow="${match.required_match}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label small mb-0">Gewenste Vaardigheden</label>
+                                            <small class="text-muted">${match.nice_to_have_match}%</small>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                 style="width: ${match.nice_to_have_match}%" 
+                                                 aria-valuenow="${match.nice_to_have_match}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <a href="/view-candidate/${match.candidate_id}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye me-1"></i>Profiel Bekijken
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary toggle-details" 
+                                            data-target="#details-${match.candidate_id}">
+                                        <i class="bi bi-list-check me-1"></i>Details Bekijken
+                                    </button>
+                                </div>
+                                
+                                <div class="collapse mt-3" id="details-${match.candidate_id}">
+                                    <div class="details-box">
+                                        <table class="table table-hover mb-0 details-table">
+                                            <thead>
+                                                <tr>
+                                                    <th width="25%">Vaardigheid</th>
+                                                    <th width="15%">Type</th>
+                                                    <th width="15%">Status</th>
+                                                    <th width="45%">Details</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${sortedDetails.map(detail => `
+                                                    <tr>
+                                                        <td class="skill-name-cell">${detail.skill_name}</td>
+                                                        <td>
+                                                            <span class="skill-type">
+                                                                <i class="bi bi-${detail.type === 'Required' ? 'star-fill required' : 'plus-circle nice'}"></i>
+                                                                ${detail.type === 'Required' ? 'Vereist' : 'Gewenst'}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge status-badge ${detail.match ? 'bg-success' : 'bg-danger'}">
+                                                                ${detail.match ? 'Gevonden' : 'Niet Gevonden'}
+                                                            </span>
+                                                        </td>
+                                                        <td class="details-reason">${detail.reason}</td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsHtml += '</div>';
+                matchResults.innerHTML = resultsHtml;
+                
+                // Initialize toggle functionality for details
+                const toggleButtons = matchResults.querySelectorAll('.toggle-details');
+                toggleButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const targetId = this.getAttribute('data-target');
+                        const targetElement = document.querySelector(targetId);
+                        
+                        // Toggle the collapse
+                        if (targetElement.classList.contains('show')) {
+                            targetElement.classList.remove('show');
+                            this.innerHTML = '<i class="bi bi-list-check me-1"></i>Details Bekijken';
+                        } else {
+                            targetElement.classList.add('show');
+                            this.innerHTML = '<i class="bi bi-list-check me-1"></i>Details Verbergen';
+                        }
+                    });
+                });
+            } else {
+                matchResults.innerHTML = `
+                    <div class="no-results">
+                        <i class="bi bi-search"></i>
+                        <h5>Geen Matches Gevonden</h5>
+                        <p>Pas de vereiste vaardigheden of vacaturetekst aan om meer kandidaten te vinden.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            this.disabled = false;
+            this.innerHTML = '<i class="bi bi-check-circle me-2"></i>Apply Changes & Find Matches';
+            matchResults.innerHTML = '<div class="alert alert-danger">Error recalculating matches. Please try again.</div>';
+        });
+    });
+    
+    // Initialize with existing skills if any
+    {% if vacancy_skills is defined %}
+        {% for skill in vacancy_skills.required_skills %}
+            addSkill('required', '{{ skill.skill_name }}', {{ skill.years_experience }});
+        {% endfor %}
+        
+        {% for skill in vacancy_skills.nice_to_have_skills %}
+            addSkill('nice', '{{ skill.skill_name }}', {{ skill.years_experience }});
+        {% endfor %}
+    {% endif %}
+    
+    // Add keyboard support for modals
+    document.getElementById('required-skill-name').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('save-required-skill').click();
+        }
+    });
+    
+    document.getElementById('required-skill-years').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('save-required-skill').click();
+        }
+    });
+    
+    document.getElementById('nice-skill-name').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('save-nice-skill').click();
+        }
+    });
+    
+    document.getElementById('nice-skill-years').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('save-nice-skill').click();
+        }
+    });
+    
+    document.getElementById('edit-skill-name').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('update-skill').click();
+        }
+    });
+    
+    document.getElementById('edit-skill-years').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('update-skill').click();
+        }
+    });
+});
+</script>
+{% endblock %}

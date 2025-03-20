@@ -1,0 +1,99 @@
+<div class="row">
+{% for match in matches %}
+    <div class="col-md-6 mb-4">
+        <div class="candidate-card h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h5 class="mb-1">{{ match.name }}</h5>
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-envelope me-2"></i>{{ match.email }}
+                    </p>
+                </div>
+                <div class="text-end">
+                    <div class="match-score">{{ match.match_percentage }}%</div>
+                    <span class="badge bg-{{ 'success' if match.match_percentage >= 70 else 'warning' if match.match_percentage >= 50 else 'danger' }}">
+                        {{ 'Strong Match' if match.match_percentage >= 70 else 'Potential Match' if match.match_percentage >= 50 else 'Low Match' }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="skills-match mb-3">
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label small mb-0">Required Skills</label>
+                        <small class="text-muted">{{ match.required_match }}%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" 
+                             style="width: {{ match.required_match }}%" 
+                             aria-valuenow="{{ match.required_match }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label small mb-0">Nice to Have Skills</label>
+                        <small class="text-muted">{{ match.nice_to_have_match }}%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" 
+                             style="width: {{ match.nice_to_have_match }}%" 
+                             aria-valuenow="{{ match.nice_to_have_match }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('view_candidate', candidate_id=match.candidate_id) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-eye me-1"></i>View Profile
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" 
+                        data-bs-target="#details-{{ match.candidate_id }}">
+                    <i class="bi bi-list-check me-1"></i>View Details
+                </button>
+            </div>
+            
+            <div class="collapse mt-3" id="details-{{ match.candidate_id }}">
+                <div class="card card-body p-0">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Skill</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detail in match.details|sort(attribute='match', reverse=True) %}
+                                <tr>
+                                    <td><strong>{{ detail.skill_name }}</strong></td>
+                                    <td>{{ detail.type }}</td>
+                                    <td>
+                                        <span class="badge {{ 'bg-success' if detail.match else 'bg-danger' }}">
+                                            {{ 'Matched' if detail.match else 'Not Matched' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-muted small">{{ detail.reason }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+            <h5 class="mt-3 mb-2">No Matches Found</h5>
+            <p class="text-muted mb-0">Try adjusting the required skills or job description to find more candidates.</p>
+        </div>
+    </div>
+{% endfor %}
+</div> 

@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Skill Search - CV Analyzer{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Add Wortell color variables */
+    :root {
+        --wortell-blue: #0078D4;
+        --wortell-dark-blue: #005A9E;
+        --wortell-light-blue: #50A0D2;
+        --wortell-green: #00D66C;
+        --wortell-dark-green: #00B85D;
+        --wortell-light-green: #33DB84;
+        --wortell-purple: #6C1F85;
+        --wortell-gray: #F3F3F3;
+        --wortell-dark-gray: #333333;
+        
+        --primary-color: var(--wortell-green);
+        --primary-dark: var(--wortell-dark-green);
+        --primary-light: var(--wortell-light-green);
+        --secondary-color: var(--wortell-purple);
+    }
+    
+    /* Welcome Banner - matching style from candidates/dashboard */
+    .welcome-banner {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #7cd3c7 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+    }
+
+    .welcome-banner h2 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-banner p {
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+        max-width: 600px;
+    }
+
+    .welcome-banner .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .welcome-banner .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+    }
+
+    .welcome-banner .breadcrumb-item a:hover {
+        color: white;
+    }
+
+    .welcome-banner .breadcrumb-item.active {
+        color: white;
+    }
+
+    .welcome-banner .breadcrumb-item+.breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Existing styles */
+    .search-container {
+        max-width: 600px;
+        margin: 0 auto 2rem;
+    }
+    
+    .input-group {
+        box-shadow: var(--box-shadow);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+    
+    .input-group .form-control {
+        border-right: none;
+        padding-left: 1rem;
+    }
+    
+    .input-group .btn {
+        border-color: #ced4da;
+        background: white;
+        color: var(--primary-color);
+    }
+    
+    .input-group .btn:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .results-count {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        color: #6c757d;
+    }
+    
+    .candidate-card {
+        background: white;
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    .candidate-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+    
+    .candidate-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .candidate-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-right: 1rem;
+    }
+    
+    .skill-highlight {
+        background-color: rgba(0, 214, 108, 0.1);
+        border-left: 3px solid var(--primary-color);
+        padding: 0.5rem 1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .experience-badge {
+        background-color: #e6f4ea;
+        color: var(--primary-dark);
+        font-weight: 600;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+    }
+    
+    .skill-badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: 0.85em;
+        font-weight: 600;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 50rem;
+        background-color: #e9ecef;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Banner Header -->
+    <div class="welcome-banner mb-4">
+        <h2 class="page-title">Vaardigheid Zoeken</h2>
+        <p>Zoek naar kandidaten op basis van specifieke vaardigheden en ontdek de meest geschikte talenten voor je projecten.</p>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Vaardigheid Zoeken</li>
+            </ol>
+        </nav>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Search Form -->
+    <div class="search-container">
+        <form id="skillSearchForm" method="POST" action="{{ url_for('skill_search') }}">
+            <div class="input-group">
+                <input type="text" id="skillInput" name="skill" class="form-control" placeholder="Zoek naar een vaardigheid (bijv. Python, JavaScript, AWS)..." aria-label="Search for skill" value="{{ skill if skill else '' }}">
+                <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-search me-1"></i> Zoeken
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    {% if skill %}
+    <div class="results-section">
+        <div class="results-count">
+            {% if candidates|length > 0 %}
+                <strong>{{ candidates|length }}</strong> kandidaten gevonden met <strong>{{ skill }}</strong> vaardigheden
+            {% else %}
+                Geen kandidaten gevonden met <strong>{{ skill }}</strong> vaardigheden
+            {% endif %}
+        </div>
+
+        <div class="row">
+            {% if candidates|length > 0 %}
+                {% for candidate in candidates %}
+                <div class="col-md-6 candidate-card">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="candidate-info">
+                                <div class="candidate-avatar">
+                                    {{ candidate.name[0]|upper }}
+                                </div>
+                                <div>
+                                    <h5 class="card-title mb-1">{{ candidate.name }}</h5>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-envelope me-1"></i> {{ candidate.email }}
+                                    </div>
+                                    {% if candidate.phone %}
+                                    <div class="text-muted small">
+                                        <i class="bi bi-telephone me-1"></i> {{ candidate.phone }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="skill-highlight">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>{{ skill }}</strong>
+                                    <span class="experience-badge">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        {{ candidate.years_experience }} jaar
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <h6 class="mb-2">Andere vaardigheden:</h6>
+                                <div>
+                                    {% for other_skill in candidate.other_skills %}
+                                    <span class="skill-badge">
+                                        {{ other_skill.skill_name }} 
+                                        <small>({{ other_skill.years_experience }}j)</small>
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <a href="{{ url_for('view_candidate', candidate_id=candidate.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-file-earmark-person me-1"></i> Profiel Bekijken
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 mb-2">Geen Kandidaten Gevonden</h5>
+                        <p class="text-muted mb-0">Probeer een andere vaardigheid of controleer je spelling.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+        <h5 class="mt-3 mb-2">Zoek naar een Vaardigheid</h5>
+        <p class="text-muted mb-0">Voer hierboven een vaardigheid in om kandidaten met passende ervaring te vinden.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

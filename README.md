@@ -1,2 +1,2 @@
-# cv-analyzer
-nice app.
+# cv-analysis
+ Cooltool bro.

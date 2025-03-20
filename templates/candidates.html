@@ -1,0 +1,912 @@
+{% extends "base.html" %}
+
+{% block title %}Smarties - CV Analyzer{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --wortell-blue: #0078D4;
+        --wortell-dark-blue: #005A9E;
+        --wortell-light-blue: #50A0D2;
+        --wortell-green: #00D66C;
+        --wortell-dark-green: #00B85D;
+        --wortell-light-green: #33DB84;
+        --wortell-purple: #6C1F85;
+        --wortell-gray: #F3F3F3;
+        --wortell-dark-gray: #333333;
+        
+        --primary-color: var(--wortell-green);
+        --primary-dark: var(--wortell-dark-green);
+        --primary-light: var(--wortell-light-green);
+        --secondary-color: var(--wortell-purple);
+        --secondary-dark: #591a6d;
+        --secondary-light: #8229a0;
+        --light-bg: #f8f9fa;
+        --dark-bg: #212529;
+        --text-color: #2c2c2c;
+        --light-text: #f8f9fa;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        background-color: var(--light-bg);
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+
+    
+
+    .btn {
+        border-radius: var(--border-radius);
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        border: none;
+        box-shadow: 0 2px 6px rgba(0,214,108,0.2);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,214,108,0.3);
+    }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-outline-danger:hover {
+        background: #dc3545;
+        color: white;
+    }
+
+    .page-title {
+        font-weight: 300;
+        
+        margin-bottom: 25px;
+    }
+
+
+
+    .candidate-card {
+        background: white;
+        border-radius: var(--border-radius);
+        border: none;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+
+    .candidate-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .candidate-info {
+        padding: 1.25rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .candidate-actions {
+        padding: 0.75rem 1.25rem;
+        background: var(--light-bg);
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1rem 1.5rem;
+    }
+
+    /* Advanced search and filters */
+    .search-container {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .search-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .search-body {
+        padding: 1.5rem;
+    }
+
+    .search-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background: var(--light-bg);
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .input-group {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .input-group .form-control {
+        border-right: none;
+        padding-left: 1rem;
+    }
+
+    .input-group .btn {
+        border-color: #ced4da;
+        background: white;
+        color: var(--primary-color);
+    }
+
+    .input-group .btn:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    /* Stats section */
+    .stats-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.25rem;
+        text-align: center;
+        box-shadow: var(--box-shadow);
+        flex: 1;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: var(--text-color);
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+
+    /* View toggle and sorting */
+    .view-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-group .btn {
+        padding: 0.375rem 0.75rem;
+    }
+
+    .btn-group .btn.active {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    /* List view */
+    .candidates-list .candidate-card {
+        display: flex;
+        align-items: center;
+        padding: 0;
+    }
+
+    .candidates-list .candidate-info {
+        flex: 1;
+        border-bottom: none;
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+    }
+
+    .candidates-list .candidate-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-light);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-right: 1rem;
+    }
+
+    .candidates-list .candidate-details {
+        flex: 1;
+    }
+
+    .candidates-list .candidate-actions {
+        width: auto;
+        background: transparent;
+    }
+
+    /* Grid view */
+    .candidates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .candidates-grid .candidate-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .candidates-grid .candidate-info {
+        flex: 1;
+        padding: 1.25rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .candidates-grid .candidate-actions {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background: var(--light-bg);
+    }
+
+    .candidates-grid .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .candidates-grid .candidate-actions .btn i {
+        font-size: 0.875rem;
+    }
+
+    /* Pagination */
+    .pagination-container {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .pagination .page-link {
+        color: var(--primary-color);
+    }
+
+    /* Tags and badges */
+    .candidate-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+    }
+
+    .candidate-tag {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 50px;
+        background-color: rgba(0, 214, 108, 0.1);
+        color: var(--primary-color);
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .candidates-list .candidate-card {
+            flex-direction: column;
+        }
+        
+        .candidates-list .candidate-info {
+            border-right: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+        
+        .candidates-list .candidate-actions {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .stats-container {
+            flex-direction: column;
+        }
+        
+        .view-controls {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .candidate-actions {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .candidate-actions .btn {
+            flex: 1;
+            justify-content: center;
+            min-width: 80px;
+        }
+    }
+
+    /* Welcome Banner - adding this to match other pages */
+    .welcome-banner {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #7cd3c7 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+    }
+
+    .welcome-banner h2 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-banner p {
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+        max-width: 600px;
+    }
+
+    .welcome-banner .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .welcome-banner .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+    }
+
+    .welcome-banner .breadcrumb-item a:hover {
+        color: white;
+    }
+
+    .welcome-banner .breadcrumb-item.active {
+        color: white;
+    }
+
+    .welcome-banner .breadcrumb-item+.breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- New welcome banner header -->
+    <div class="welcome-banner mb-4">
+        <h2 class="page-title">Smarties</h2>
+        <p>Beheer alle kandidaten in het systeem, bekijk hun vaardigheden en ervaring, en zoek de beste match voor je vacatures.</p>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Smarties</li>
+            </ol>
+        </nav>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="d-flex justify-content-end mb-4">
+        <a href="{{ url_for('upload_page') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i>
+            Meer CV's Uploaden
+        </a>
+    </div>
+    
+    {% if candidates %}
+        <!-- Advanced Search and Filters -->
+        <div class="search-container">
+            <div class="search-header">
+                <h5 class="mb-0">Search & Filter</h5>
+                <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSearch" aria-expanded="false">
+                    <i class="bi bi-sliders"></i>
+                    Advanced Filters
+                </button>
+            </div>
+            <div class="search-body">
+                <form id="searchForm">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search smartiesby name, email, skills..." aria-label="Search">
+                        <button type="button" class="btn btn-link position-absolute end-0 bg-transparent border-0 d-none" id="clearSearchBtn" style="right: 50px; z-index: 5;">
+                            <i class="bi bi-x-circle"></i>
+                        </button>
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="collapse mt-3" id="advancedSearch">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Skills</label>
+                                <select class="form-select" id="skillFilter" multiple>
+                                    <option value="">All Skills</option>
+                                    <!-- Populate with available skills -->
+                                    <option value="python">Python</option>
+                                    <option value="javascript">JavaScript</option>
+                                    <option value="java">Java</option>
+                                    <!-- Add more skills dynamically -->
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Experience Level</label>
+                                <select class="form-select" id="experienceFilter">
+                                    <option value="">All Levels</option>
+                                    <option value="junior">Junior (0-2 years)</option>
+                                    <option value="mid">Mid-level (3-5 years)</option>
+                                    <option value="senior">Senior (6+ years)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date Added</label>
+                                <select class="form-select" id="dateFilter">
+                                    <option value="">Any Time</option>
+                                    <option value="today">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="search-footer">
+                <div>
+                    <span id="totalResults" class="text-muted">Showing all {{ candidates|length }} candidates</span>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="resetFilters">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Reset Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCandidates">{{ candidates|length }}</div>
+                <div class="stat-label">Total Candidates</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="filteredCandidates">{{ candidates|length }}</div>
+                <div class="stat-label">Filtered Results</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ '%.1f'|format(candidates|length / 10) }}</div>
+                <div class="stat-label">Pages</div>
+            </div>
+        </div>
+
+        <!-- View Controls -->
+        <div class="view-controls">
+            <div class="btn-group" role="group" aria-label="View toggle">
+                <button type="button" class="btn btn-outline-primary active" id="listViewBtn">
+                    <i class="bi bi-list-ul"></i> List View
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="gridViewBtn">
+                    <i class="bi bi-grid-3x3-gap"></i> Grid View
+                </button>
+            </div>
+            
+            <div class="d-flex align-items-center">
+                <label class="me-2 text-muted">Sort by:</label>
+                <select class="form-select form-select-sm" id="sortOptions" style="width: auto;">
+                    <option value="name_asc">Name (A-Z)</option>
+                    <option value="name_desc">Name (Z-A)</option>
+                    <option value="date_desc">Date Added (Newest)</option>
+                    <option value="date_asc">Date Added (Oldest)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Candidates List View (default) -->
+        <div id="candidatesContainer" class="candidates-list">
+            {% for candidate in candidates %}
+                <div class="candidate-card" data-candidate-id="{{ candidate.id }}">
+                    <div class="candidate-info">
+                        <div class="candidate-avatar">{{ candidate.name[0]|upper }}</div>
+                        <div class="candidate-details">
+                            <h5 class="mb-1">{{ candidate.name }}</h5>
+                            <div class="text-muted small mb-1">
+                                <i class="bi bi-envelope me-1"></i>{{ candidate.email }}
+                                {% if candidate.phone %}
+                                <span class="ms-2"><i class="bi bi-telephone me-1"></i>{{ candidate.phone }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="candidate-tags">
+                                <!-- Example tags - these would be populated dynamically -->
+                                <span class="candidate-tag">Python</span>
+                                <span class="candidate-tag">JavaScript</span>
+                                <span class="candidate-tag">React</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="candidate-actions">
+                        <a href="{{ url_for('view_candidate', candidate_id=candidate.id) }}" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                        <a href="{{ url_for('edit_candidate', candidate_id=candidate.id) }}" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#deleteModal"
+                                data-candidate-id="{{ candidate.id }}"
+                                data-candidate-name="{{ candidate.name }}">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state text-center py-5">
+            <i class="bi bi-people display-1 text-muted mb-4"></i>
+            <h3>No SmartiesFound</h3>
+            <p class="text-muted">Upload some CVs to get started with candidate management.</p>
+            <a href="{{ url_for('upload_page') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-upload me-2"></i>Upload CVs
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete <span id="candidateName"></span>? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteForm" method="post" action="">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Global variable for current page
+    let currentPage = {{ current_page|default(1) }};
+
+    // Set up the delete modal
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const candidateId = button.getAttribute('data-candidate-id');
+            const candidateName = button.getAttribute('data-candidate-name');
+            
+            document.getElementById('candidateName').textContent = candidateName;
+            document.getElementById('deleteForm').action = '/candidate/delete/' + candidateId + '?page=' + currentPage;
+        });
+    }
+
+    // View toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const listViewBtn = document.getElementById('listViewBtn');
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const candidatesContainer = document.getElementById('candidatesContainer');
+        
+        if (listViewBtn && gridViewBtn && candidatesContainer) {
+            listViewBtn.addEventListener('click', function() {
+                candidatesContainer.className = 'candidates-list';
+                listViewBtn.classList.add('active');
+                gridViewBtn.classList.remove('active');
+                localStorage.setItem('candidatesView', 'list');
+            });
+            
+            gridViewBtn.addEventListener('click', function() {
+                candidatesContainer.className = 'candidates-grid';
+                gridViewBtn.classList.add('active');
+                listViewBtn.classList.remove('active');
+                localStorage.setItem('candidatesView', 'grid');
+            });
+            
+            // Load saved view preference
+            const savedView = localStorage.getItem('candidatesView');
+            if (savedView === 'grid') {
+                gridViewBtn.click();
+            }
+        }
+        
+        // Search and filter functionality
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const resetFiltersBtn = document.getElementById('resetFilters');
+        const skillFilter = document.getElementById('skillFilter');
+        const experienceFilter = document.getElementById('experienceFilter');
+        const dateFilter = document.getElementById('dateFilter');
+        const sortOptions = document.getElementById('sortOptions');
+        
+        if (searchForm && searchInput) {
+            // Initial setup
+            updateClearButtonVisibility();
+            
+            // Event listeners
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                applyFilters();
+            });
+            
+            searchInput.addEventListener('input', function() {
+                applyFilters();
+                updateClearButtonVisibility();
+            });
+            
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', function() {
+                    clearSearch();
+                });
+            }
+            
+            if (resetFiltersBtn) {
+                resetFiltersBtn.addEventListener('click', function() {
+                    resetAllFilters();
+                });
+            }
+            
+            // Add event listeners for filters and sorting
+            if (skillFilter) skillFilter.addEventListener('change', applyFilters);
+            if (experienceFilter) experienceFilter.addEventListener('change', applyFilters);
+            if (dateFilter) dateFilter.addEventListener('change', applyFilters);
+            if (sortOptions) sortOptions.addEventListener('change', applyFilters);
+            
+            // Functions
+            function applyFilters() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const candidateCards = document.querySelectorAll('.candidate-card');
+                let matchCount = 0;
+                
+                // Get filter values
+                const skills = skillFilter ? Array.from(skillFilter.selectedOptions).map(opt => opt.value) : [];
+                const experience = experienceFilter ? experienceFilter.value : '';
+                const dateAdded = dateFilter ? dateFilter.value : '';
+                const sortBy = sortOptions ? sortOptions.value : 'name_asc';
+                
+                // Filter candidates
+                const visibleCandidates = [];
+                
+                candidateCards.forEach(card => {
+                    // Get text content from all relevant elements within the card
+                    const cardText = card.textContent.toLowerCase();
+                    
+                    // Apply search filter
+                    let isVisible = cardText.includes(searchTerm);
+                    
+                    // Apply additional filters (these would need to be implemented with actual data)
+                    // For now, we'll just use the search term
+                    
+                    if (isVisible) {
+                        matchCount++;
+                        visibleCandidates.push(card);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Sort visible candidates
+                sortCandidates(visibleCandidates, sortBy);
+                
+                // Update the stats count
+                updateStats(matchCount, candidateCards.length, searchTerm);
+                
+                // Show/hide empty state message
+                updateEmptyState(matchCount, searchTerm);
+            }
+            
+            function sortCandidates(candidates, sortBy) {
+                const container = document.getElementById('candidatesContainer');
+                
+                if (!container || candidates.length === 0) return;
+                
+                candidates.sort((a, b) => {
+                    const nameA = a.querySelector('h5').textContent.trim();
+                    const nameB = b.querySelector('h5').textContent.trim();
+                    
+                    if (sortBy === 'name_asc') {
+                        return nameA.localeCompare(nameB);
+                    } else if (sortBy === 'name_desc') {
+                        return nameB.localeCompare(nameA);
+                    }
+                    // Other sorting options would be implemented here
+                    return 0;
+                });
+                
+                // Reorder the DOM elements
+                candidates.forEach(card => {
+                    container.appendChild(card);
+                });
+            }
+            
+            function updateClearButtonVisibility() {
+                if (clearSearchBtn) {
+                    if (searchInput.value.trim() !== '') {
+                        clearSearchBtn.classList.remove('d-none');
+                    } else {
+                        clearSearchBtn.classList.add('d-none');
+                    }
+                }
+            }
+            
+            function clearSearch() {
+                searchInput.value = '';
+                updateClearButtonVisibility();
+                applyFilters();
+            }
+            
+            function resetAllFilters() {
+                // Reset search input
+                searchInput.value = '';
+                updateClearButtonVisibility();
+                
+                // Reset select filters
+                if (skillFilter) {
+                    for (let i = 0; i < skillFilter.options.length; i++) {
+                        skillFilter.options[i].selected = false;
+                    }
+                }
+                
+                if (experienceFilter) experienceFilter.selectedIndex = 0;
+                if (dateFilter) dateFilter.selectedIndex = 0;
+                if (sortOptions) sortOptions.selectedIndex = 0;
+                
+                // Apply the reset filters
+                applyFilters();
+            }
+            
+            function updateStats(matchCount, totalCount, searchTerm) {
+                const totalResults = document.getElementById('totalResults');
+                const filteredCandidates = document.getElementById('filteredCandidates');
+                
+                if (filteredCandidates) {
+                    filteredCandidates.textContent = matchCount;
+                }
+                
+                if (totalResults) {
+                    if (matchCount < totalCount) {
+                        totalResults.textContent = `Showing ${matchCount} of ${totalCount} candidates`;
+                    } else {
+                        totalResults.textContent = `Showing all ${totalCount} candidates`;
+                    }
+                }
+            }
+            
+            function updateEmptyState(matchCount, searchTerm) {
+                const candidatesContainer = document.getElementById('candidatesContainer');
+                
+                if (!candidatesContainer) return;
+                
+                // Check if we need to show an empty state message
+                if (matchCount === 0) {
+                    // Remove any existing empty state
+                    let existingEmptyState = candidatesContainer.querySelector('.empty-search-state');
+                    if (existingEmptyState) {
+                        existingEmptyState.remove();
+                    }
+                    
+                    // Create and append the empty state message
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'empty-search-state text-center py-5';
+                    emptyState.innerHTML = `
+                        <i class="bi bi-search display-1 text-muted mb-4"></i>
+                        <h3>No Results Found</h3>
+                        <p class="text-muted">No candidates match your search criteria "${searchTerm}".</p>
+                        <button class="btn btn-outline-primary mt-3" id="clearSearchBtn2">
+                            <i class="bi bi-arrow-counterclockwise me-2"></i>Clear Search
+                        </button>
+                    `;
+                    
+                    candidatesContainer.appendChild(emptyState);
+                    
+                    // Add event listener to the clear search button
+                    const clearSearchBtn2 = document.getElementById('clearSearchBtn2');
+                    if (clearSearchBtn2) {
+                        clearSearchBtn2.addEventListener('click', resetAllFilters);
+                    }
+                } else {
+                    // Remove any existing empty state
+                    let existingEmptyState = candidatesContainer.querySelector('.empty-search-state');
+                    if (existingEmptyState) {
+                        existingEmptyState.remove();
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,1094 @@
+{% extends "base.html" %}
+
+{% block title %}CV Analyzer | Upload{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --wortell-blue: #0078D4;
+        --wortell-dark-blue: #005A9E;
+        --wortell-light-blue: #50A0D2;
+        --wortell-green: #00D66C;
+        --wortell-dark-green: #00B85D;
+        --wortell-light-green: #33DB84;
+        --wortell-purple: #6C1F85;
+        --wortell-gray: #F3F3F3;
+        --wortell-dark-gray: #333333;
+        
+        --primary-color: var(--wortell-green);
+        --primary-dark: var(--wortell-dark-green);
+        --primary-light: var(--wortell-light-green);
+        --secondary-color: var(--wortell-blue);
+        --secondary-dark: var(--wortell-dark-blue);
+        --secondary-light: var(--wortell-light-blue);
+        --accent-color: var(--wortell-purple);
+        --light-bg: #f8f9fa;
+        --dark-bg: #212529;
+        --text-color: #2c2c2c;
+        --light-text: #f8f9fa;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+
+
+
+    /* Layout */
+    .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-weight: 700;
+        font-size: 1.75rem;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+        color: var(--text-muted);
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    /* Upload Container */
+    .upload-card {
+        background: var(--foreground);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        border: none;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .card-header {
+        background-color: var(--foreground);
+        border-bottom: 1px solid var(--border);
+        padding: 1.25rem 1.5rem;
+    }
+
+    .card-header h5 {
+        font-weight: 600;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    /* Drop Zone */
+    .drop-zone {
+        border: 2px dashed var(--border);
+        border-radius: var(--border-radius);
+        background-color: rgba(0, 214, 108, 0.03);
+        padding: 3rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        margin: 1.5rem;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+        border-color: var(--primary-color);
+        background-color: rgba(0, 214, 108, 0.06);
+    }
+    .p-3 {
+        padding: 1rem !important;
+        background-color: white;
+    }
+    .drop-zone-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .drop-zone-text {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        color: var(--text);
+    }
+
+    .drop-zone-hint {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    /* File List */
+    .file-list {
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 0 1.5rem;
+    }
+
+    .file-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto auto;
+        gap: 1rem;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(0, 214, 108, 0.03);
+        border-radius: var(--border-radius);
+        margin-bottom: 0.75rem;
+        transition: var(--transition);
+    }
+
+    .file-item:hover {
+        background: rgba(0, 214, 108, 0.06);
+    }
+
+    .file-item.processing {
+        background: rgba(0, 214, 108, 0.1);
+        border: 1px solid rgba(0, 214, 108, 0.2);
+    }
+
+    .file-item.success {
+        background: rgba(0, 214, 108, 0.1);
+        border: 1px solid rgba(0, 214, 108, 0.2);
+    }
+
+    .file-item.error {
+        background: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.2);
+    }
+
+    .file-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--foreground);
+        color: var(--primary-color);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .file-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .file-name {
+        font-weight: 500;
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;
+    }
+
+    .file-size {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .file-progress {
+        width: 120px;
+    }
+
+    .progress {
+        height: 6px;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        background-color: var(--primary-color);
+        transition: width 0.3s ease;
+    }
+
+    .file-status {
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.2px;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        background: rgba(108, 117, 125, 0.1);
+        color: var(--text-muted);
+    }
+
+    .status-uploading {
+        background: rgba(0, 214, 108, 0.1);
+        color: var(--primary-color);
+    }
+
+    .status-success {
+        background: rgba(0, 214, 108, 0.1);
+        color: var(--success);
+    }
+
+    .status-error {
+        background: rgba(220, 53, 69, 0.1);
+        color: var(--danger);
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 0.5rem 1.25rem;
+        font-weight: 500;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 214, 108, 0.2);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 214, 108, 0.3);
+    }
+
+    .btn-success {
+        background-color: var(--success);
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 214, 108, 0.2);
+    }
+
+    .btn-success:hover {
+        background-color: #00b85d;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 214, 108, 0.3);
+    }
+
+    /* Processing Overlay */
+    .processing-overlay {
+        background-color: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(5px);
+        transition: opacity 0.3s ease;
+    }
+
+    .processing-dialog {
+        background: var(--foreground);
+        border-radius: var(--border-radius);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        max-width: 360px;
+        width: 90%;
+        animation: dialogFadeIn 0.3s ease;
+    }
+
+    @keyframes dialogFadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dialog-header {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    #processingFileName {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 270px;
+    }
+
+    #processingDetailedStatus {
+        font-size: 0.75rem;
+    }
+
+    .fs-7 {
+        font-size: 0.75rem !important;
+    }
+
+    /* If you want to add a pulsing animation to the copy.gif */
+    @keyframes pulse-subtle {
+        0% { opacity: 0.9; }
+        50% { opacity: 1; }
+        100% { opacity: 0.9; }
+    }
+
+    .processing-dialog img {
+        animation: pulse-subtle 1.5s infinite;
+    }
+
+    /* Results Container */
+    .results-container {
+        background: var(--foreground);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .result-item {
+        padding: 1.25rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .result-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .result-icon.success {
+        background: rgba(0, 214, 108, 0.1);
+        color: var(--success);
+    }
+
+    .result-icon.error {
+        background: rgba(220, 53, 69, 0.1);
+        color: var(--danger);
+    }
+
+    /* Toast */
+    .toast {
+        background: var(--foreground);
+        border: none;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        border-radius: var(--border-radius);
+    }
+
+    .toast-header {
+        background: var(--success);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .file-animation-icon {
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes completeAnimation {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .file-complete {
+        animation: completeAnimation 0.5s;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .file-item {
+            grid-template-columns: auto 1fr;
+            grid-template-rows: auto auto;
+            gap: 0.75rem;
+        }
+
+        .file-progress {
+            grid-column: 1 / -1;
+            width: 100%;
+        }
+
+        .file-status {
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+
+        .file-name {
+            max-width: 180px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .drop-zone {
+            padding: 2rem 1rem;
+        }
+
+        .file-name {
+            max-width: 140px;
+        }
+
+        .button-group {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+    }
+
+    .spinner-border {
+        color: var(--primary-color) !important;
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+        background: linear-gradient(135deg, var(--wortell-green) 0%, #7cd3c7 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--box-shadow);
+    }
+
+    .welcome-banner h2 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-banner p {
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+        max-width: 600px;
+    }
+
+    .welcome-banner .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .welcome-banner .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+    }
+
+    .welcome-banner .breadcrumb-item a:hover {
+        color: white;
+    }
+
+    .welcome-banner .breadcrumb-item.active {
+        color: white;
+    }
+
+    .welcome-banner .breadcrumb-item+.breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="welcome-banner mb-4">
+    <h2 class="page-title">CV Uploaden</h2>
+    <p>Upload en analyseer CV's van kandidaten om vaardigheden, werkervaring en meer te extraheren.</p>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">CV Uploaden</li>
+        </ol>
+    </nav>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="upload-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>Upload en verwerk CV's</h5>
+        <span class="badge bg-primary-subtle text-primary px-3 py-2">Ondersteund: PDF, DOCX, DOC, TXT</span>
+    </div>
+    <div class="card-body">
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="drop-zone" id="drop-area">
+                <i class="bi bi-cloud-upload drop-zone-icon"></i>
+                <h4 class="drop-zone-text">Sleep bestanden hierheen</h4>
+                <p class="drop-zone-hint mb-4">of klik om bestanden van je computer te selecteren</p>
+                <input type="file" name="files[]" id="file-input" multiple accept=".pdf,.docx,.doc,.txt" style="display: none;">
+                <button type="button" class="btn btn-primary" id="select-files-btn">
+                    <i class="bi bi-file-earmark-plus"></i> Bestanden selecteren
+                </button>
+            </div>
+            
+            <div class="file-list" id="file-list"></div>
+            
+            <div class="card-footer bg-transparent border-0 p-3">
+                <div id="overall-progress-container" class="mb-4 d-none">
+                    <div class="p-4 rounded-3 bg-light border">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="spinner-border text-primary me-3" role="status">
+                                <span class="visually-hidden">Laden...</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold" id="processingMessage">CV's verwerken...</h6>
+                                <p class="text-muted mb-0" id="processingStatus">Initialiseren...</p>
+                            </div>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div id="overall-progress-bar" class="progress-bar" role="progressbar" 
+                                style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between button-group">
+                    <div>
+                        <button type="button" class="btn btn-primary" id="upload-btn" disabled>
+                            <i class="bi bi-cpu"></i> CV's Verwerken
+                        </button>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('view_candidates') }}" class="btn btn-success">
+                            <i class="bi bi-people"></i> Kandidaten Bekijken
+                        </a>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-grid"></i> Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="results-container" id="processing-results" style="display: none;">
+    <div class="card-header">
+        <h5 class="mb-0">Verwerkingsresultaten</h5>
+    </div>
+    <div class="list-group list-group-flush" id="results-list"></div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="processingCompleteToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header">
+            <i class="bi bi-check-circle me-2"></i>
+            <strong class="me-auto">CV Analyzer</strong>
+            <small>Zojuist</small>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <p>CV-verwerking voltooid! Je kunt nu de geëxtraheerde informatie bekijken.</p>
+            <div class="mt-2 pt-2 border-top">
+                <a href="{{ url_for('view_candidates') }}" class="btn btn-sm btn-success">Kandidaten Bekijken</a>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="toast">Sluiten</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modern Processing Overlay -->
+<div id="processingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none processing-overlay" style="z-index: 1050;">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="processing-dialog">
+            <div class="dialog-header d-flex align-items-center">
+                <i class="bi bi-cpu me-2"></i>
+                <span>CV's verwerken</span>
+            </div>
+            <div class="p-3">
+                <!-- Put the GIF above, at full width -->
+                <div class="mb-3 text-center">
+                    <img src="{{ url_for('static', filename='img/copy.gif') }}" alt="Processing" style="width: 100%; height: auto;">
+                </div>
+                
+                <div class="mb-3">
+                    <h6 id="processingFileName" class="mb-1 fw-medium text-truncate fs-6">Bestanden verwerken...</h6>
+                    <small id="processingDetailedStatus" class="text-muted fs-7">Even geduld terwijl we de documenten analyseren</small>
+                </div>
+                
+                <div class="progress mb-2" style="height: 6px;">
+                    <div id="overlayProgressBar" class="progress-bar" role="progressbar" 
+                        style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <small id="progressPercentage" class="text-muted fs-7">0%</small>
+                    <small id="remainingTime" class="text-muted fs-7">Resterende tijd berekenen...</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const selectFilesBtn = document.getElementById('select-files-btn');
+    const uploadBtn = document.getElementById('upload-btn');
+    const overallProgressContainer = document.getElementById('overall-progress-container');
+    const overallProgressBar = document.getElementById('overall-progress-bar');
+    const processingResults = document.getElementById('processing-results');
+    const resultsList = document.getElementById('results-list');
+    
+    // Toast notification
+    const processingCompleteToast = document.getElementById('processingCompleteToast');
+    const toast = new bootstrap.Toast(processingCompleteToast);
+    
+    // Open file dialog when clicking the select button or drop area
+    selectFilesBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent event from bubbling up to drop area
+        fileInput.click();
+    });
+    
+    // Only trigger file input on drop area click if clicking outside the select button
+    dropArea.addEventListener('click', (e) => {
+        if (e.target === dropArea || e.target.closest('.drop-zone') && !e.target.closest('.btn')) {
+            fileInput.click();
+        }
+    });
+    
+    // Handle drag and drop events
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+        dropArea.classList.add('drag-over');
+    }
+    
+    function unhighlight() {
+        dropArea.classList.remove('drag-over');
+    }
+    
+    // Handle dropped files
+    dropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        updateFileList();
+    }
+    
+    // Handle selected files
+    fileInput.addEventListener('change', updateFileList);
+    
+    function updateFileList() {
+        fileList.innerHTML = '';
+        
+        if (fileInput.files.length > 0) {
+            for (const file of fileInput.files) {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                
+                const fileIcon = document.createElement('div');
+                fileIcon.className = 'file-icon';
+                fileIcon.innerHTML = '<i class="bi bi-file-earmark-text"></i>';
+                
+                const fileDetails = document.createElement('div');
+                fileDetails.className = 'file-details';
+                
+                const nameSpan = document.createElement('div');
+                nameSpan.className = 'file-name';
+                nameSpan.textContent = file.name;
+                
+                const sizeSpan = document.createElement('div');
+                sizeSpan.className = 'file-size';
+                sizeSpan.textContent = formatFileSize(file.size);
+                
+                fileDetails.appendChild(nameSpan);
+                fileDetails.appendChild(sizeSpan);
+                
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'file-progress';
+                
+                const progress = document.createElement('div');
+                progress.className = 'progress';
+                
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressBar.setAttribute('role', 'progressbar');
+                progressBar.setAttribute('aria-valuenow', '0');
+                progressBar.setAttribute('aria-valuemin', '0');
+                progressBar.setAttribute('aria-valuemax', '100');
+                progressBar.style.width = '0%';
+                
+                progress.appendChild(progressBar);
+                progressContainer.appendChild(progress);
+                
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'file-status status-pending';
+                statusSpan.textContent = 'Pending';
+                
+                item.appendChild(fileIcon);
+                item.appendChild(fileDetails);
+                item.appendChild(progressContainer);
+                item.appendChild(statusSpan);
+                
+                fileList.appendChild(item);
+            }
+            
+            uploadBtn.disabled = false;
+        } else {
+            uploadBtn.disabled = true;
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Upload event listener
+    uploadBtn.addEventListener('click', uploadFiles);
+    
+    async function processFiles(formData, files, fileItems, fileProgresses) {
+        // Show processing overlay
+        const processingOverlay = document.getElementById('processingOverlay');
+        const overlayProgressBar = document.getElementById('overlayProgressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const remainingTimeEl = document.getElementById('remainingTime');
+        const processingFileName = document.getElementById('processingFileName');
+        const processingDetailedStatus = document.getElementById('processingDetailedStatus');
+        
+        processingOverlay.classList.remove('d-none');
+        overallProgressContainer.classList.remove('d-none');
+        processingResults.style.display = 'block';
+        
+        let completedFiles = 0;
+        let successfulFiles = 0;
+        
+        // Track individual file progress for overall progress calculation
+        const fileProgressValues = new Array(files.length).fill(0);
+        
+        // Function to update overall progress based on individual file progress
+        function updateOverallProgress() {
+            // Calculate total progress as average of all file progress values
+            const totalProgress = fileProgressValues.reduce((sum, value) => sum + value, 0) / files.length;
+            const roundedProgress = Math.round(totalProgress);
+            
+            // Update both progress bars
+            overlayProgressBar.style.width = roundedProgress + '%';
+            overallProgressBar.style.width = roundedProgress + '%';
+            progressPercentage.textContent = roundedProgress + '%';
+        }
+        
+        // For time estimation
+        const startTime = Date.now();
+        let estimatedSecondsRemaining = 0;
+        
+        // Process each file sequentially
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const fileItem = fileItems[i];
+            const progressBar = fileItem.querySelector('.progress-bar');
+            const statusElement = fileItem.querySelector('.file-status');
+            const fileIcon = fileItem.querySelector('.file-icon');
+            
+            // Update current file in overlay
+            processingFileName.textContent = `Processing ${i+1} of ${files.length}: ${file.name}`;
+            processingDetailedStatus.textContent = `Analyzing CV content`;
+            
+            const processingMessage = document.getElementById('processingMessage');
+            const processingStatus = document.getElementById('processingStatus');
+            processingMessage.textContent = `Processing ${i+1} of ${files.length}: ${file.name}`;
+            processingStatus.textContent = `Copying file ${i+1} of ${files.length}`;
+            
+            // Calculate and update the estimated time
+            if (i > 0) {
+                const elapsedTime = (Date.now() - startTime) / 1000; // in seconds
+                const averageTimePerFile = elapsedTime / i;
+                estimatedSecondsRemaining = averageTimePerFile * (files.length - i);
+                
+                if (estimatedSecondsRemaining < 60) {
+                    remainingTimeEl.textContent = `About ${Math.ceil(estimatedSecondsRemaining)} seconds remaining`;
+                } else {
+                    remainingTimeEl.textContent = `About ${Math.ceil(estimatedSecondsRemaining / 60)} minutes remaining`;
+                }
+            }
+            
+            // Highlight current file with animation
+            fileItems.forEach(item => item.classList.remove('processing'));
+            fileItem.classList.add('processing');
+            fileIcon.innerHTML = '<i class="bi bi-arrow-repeat processing-icon"></i>';
+            
+            // Scroll to the current file
+            fileItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Update status
+            statusElement.className = 'file-status status-uploading';
+            statusElement.textContent = 'Processing';
+            
+            // Create a FormData object for this specific file
+            const singleFileFormData = new FormData();
+            singleFileFormData.append('files[]', file);
+            
+            try {
+                // Start with upload animation
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 3;
+                    if (progress > 90) {
+                        clearInterval(progressInterval);
+                        progress = 90; // Cap at 90% until actual completion
+                    }
+                    
+                    // Update file progress
+                    progressBar.style.width = progress + '%';
+                    progressBar.setAttribute('aria-valuenow', Math.round(progress));
+                    
+                    // Update overall progress
+                    fileProgressValues[i] = progress;
+                    updateOverallProgress();
+                    
+                    // Update status with bytes info (simulated)
+                    const bytesProcessed = Math.round((file.size * progress) / 100);
+                    processingDetailedStatus.textContent = `${formatFileSize(bytesProcessed)} of ${formatFileSize(file.size)}`;
+                    processingStatus.textContent = `Copying file ${i+1} of ${files.length} (${formatFileSize(bytesProcessed)} of ${formatFileSize(file.size)})`;
+                }, 200);
+                
+                // Send the file to the server
+                const response = await fetch('{{ url_for("upload_file") }}', {
+                    method: 'POST',
+                    body: singleFileFormData
+                });
+                
+                clearInterval(progressInterval);
+                
+                // Check if the response is JSON
+                const contentType = response.headers.get('content-type');
+                let result;
+                let isSuccess = false;
+                
+                try {
+                    // Try to parse as JSON
+                    if (contentType && contentType.includes('application/json')) {
+                        result = await response.json();
+                        isSuccess = response.ok;
+                    } else {
+                        // If not JSON, check if the response was successful
+                        isSuccess = response.ok || response.status === 302; // 302 is redirect, often after successful processing
+                        
+                        // Create a placeholder result
+                        result = {
+                            name: file.name.replace(/\.[^/.]+$/, ""), // Remove file extension
+                            skills_count: "N/A",
+                            work_exp_count: "N/A",
+                            id: "new" // Placeholder ID
+                        };
+                    }
+                } catch (parseError) {
+                    console.error("Error parsing response:", parseError);
+                    // If we can't parse the response but the file was processed, assume success
+                    isSuccess = true;
+                    result = {
+                        name: file.name.replace(/\.[^/.]+$/, ""),
+                        skills_count: "N/A",
+                        work_exp_count: "N/A",
+                        id: "new"
+                    };
+                }
+                
+                // Simulate CV processing with a delay
+                await new Promise(resolve => {
+                    let extractionProgress = 90;
+                    const extractionInterval = setInterval(() => {
+                        extractionProgress += Math.random() * 2;
+                        if (extractionProgress >= 100) {
+                            clearInterval(extractionInterval);
+                            extractionProgress = 100;
+                            resolve();
+                        }
+                        
+                        // Update file progress
+                        progressBar.style.width = extractionProgress + '%';
+                        progressBar.setAttribute('aria-valuenow', Math.round(extractionProgress));
+                        
+                        // Update overall progress
+                        fileProgressValues[i] = extractionProgress;
+                        updateOverallProgress();
+                        
+                        // Update detailed status
+                        processingDetailedStatus.textContent = `Extracting information (${Math.round(extractionProgress)}%)`;
+                    }, 100);
+                });
+                
+                // Set final progress for this file
+                fileProgressValues[i] = 100;
+                updateOverallProgress();
+                
+                if (isSuccess) {
+                    // Update UI for success with animation
+                    progressBar.style.width = '100%';
+                    progressBar.classList.add('bg-success');
+                    
+                    fileItem.classList.remove('processing');
+                    fileItem.classList.add('success', 'file-complete');
+                    fileIcon.innerHTML = '<i class="bi bi-check-circle-fill success-icon"></i>';
+                    statusElement.className = 'file-status status-success';
+                    statusElement.textContent = 'Complete';
+                    
+                    // Add to results
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'list-group-item';
+                    resultItem.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 text-success">
+                                <i class="bi bi-check-circle-fill" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">${file.name}</h6>
+                                <p class="mb-1 text-muted">Successfully processed</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    resultsList.appendChild(resultItem);
+                    successfulFiles++;
+                } else {
+                    // Handle error response
+                    progressBar.style.width = '100%';
+                    progressBar.classList.add('bg-danger');
+                    
+                    fileItem.classList.remove('processing');
+                    fileItem.classList.add('error');
+                    fileIcon.innerHTML = '<i class="bi bi-x-circle-fill error-icon"></i>';
+                    statusElement.className = 'file-status status-error';
+                    statusElement.textContent = 'Error';
+                    
+                    // Add to results
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'list-group-item list-group-item-danger';
+                    resultItem.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 text-danger">
+                                <i class="bi bi-x-circle-fill" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">${file.name}</h6>
+                                <p class="mb-1">Error: Processing failed</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    resultsList.appendChild(resultItem);
+                }
+            } catch (error) {
+                // Clear any running intervals
+                clearInterval(progressInterval);
+                
+                progressBar.style.width = '100%';
+                progressBar.classList.add('bg-danger');
+                
+                fileItem.classList.remove('processing');
+                fileItem.classList.add('error');
+                fileIcon.innerHTML = '<i class="bi bi-x-circle-fill error-icon"></i>';
+                statusElement.className = 'file-status status-error';
+                statusElement.textContent = 'Error';
+                
+                // Set final progress for this file
+                fileProgressValues[i] = 100;
+                updateOverallProgress();
+                
+                // Add to results
+                const resultItem = document.createElement('div');
+                resultItem.className = 'list-group-item list-group-item-danger';
+                resultItem.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <div class="me-3 text-danger">
+                            <i class="bi bi-x-circle-fill" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">${file.name}</h6>
+                            <p class="mb-1">Error: ${error.message || 'Network error'}</p>
+                        </div>
+                    </div>
+                `;
+                
+                resultsList.appendChild(resultItem);
+            }
+            
+            completedFiles++;
+            
+            // Update estimated time remaining at the end
+            if (i < files.length - 1) {
+                const elapsedTime = (Date.now() - startTime) / 1000; // in seconds
+                const averageTimePerFile = elapsedTime / (i + 1);
+                estimatedSecondsRemaining = averageTimePerFile * (files.length - i - 1);
+                
+                if (estimatedSecondsRemaining < 60) {
+                    remainingTimeEl.textContent = `About ${Math.ceil(estimatedSecondsRemaining)} seconds remaining`;
+                } else {
+                    remainingTimeEl.textContent = `About ${Math.ceil(estimatedSecondsRemaining / 60)} minutes remaining`;
+                }
+            }
+        }
+        
+        // All files processed
+        remainingTimeEl.textContent = 'Completed';
+        
+        // Hide processing overlay with fade effect
+        processingOverlay.style.opacity = '0';
+        setTimeout(() => {
+            processingOverlay.classList.add('d-none');
+            processingOverlay.style.opacity = '1';
+            
+            // Hide overall progress container as well
+            overallProgressContainer.classList.add('d-none');
+        }, 500);
+        
+        // Update toast message with results
+        const toastBody = processingCompleteToast.querySelector('.toast-body p');
+        toastBody.textContent = `Processing complete! ${successfulFiles} of ${files.length} CV${files.length > 1 ? 's' : ''} successfully processed.`;
+        
+        // Show toast notification when all files are processed
+        toast.show();
+        
+        // Reset file input
+        fileInput.value = '';
+        uploadBtn.disabled = true;
+    }
+    
+    function uploadFiles() {
+        if (fileInput.files.length === 0) return;
+        
+        const files = Array.from(fileInput.files);
+        const fileItems = Array.from(fileList.querySelectorAll('.file-item'));
+        const fileProgresses = Array.from(fileList.querySelectorAll('.progress-bar'));
+        
+        // Reset results
+        resultsList.innerHTML = '';
+        processingResults.style.display = 'none';
+        
+        // Process files
+        processFiles(new FormData(document.getElementById('upload-form')), files, fileItems, fileProgresses);
+    }
+</script>
+{% endblock %} 
